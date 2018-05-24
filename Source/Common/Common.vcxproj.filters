@@ -19,9 +19,18 @@
     <ClInclude Include="Private\targetver.h">
       <Filter>Private</Filter>
     </ClInclude>
+    <ClInclude Include="Public\MoREApp.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\Platform.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Common.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\MoREApp.cpp">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>

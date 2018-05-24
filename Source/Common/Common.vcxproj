@@ -21,9 +21,12 @@
   <ItemGroup>
     <ClInclude Include="Private\targetver.h" />
     <ClInclude Include="Public\Common.h" />
+    <ClInclude Include="Public\MoREApp.h" />
+    <ClInclude Include="Public\Platform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Common.cpp" />
+    <ClCompile Include="Private\MoREApp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PropertySheet.props">
@@ -108,12 +111,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <GenerateManifest>false</GenerateManifest>
     <IntDir>$(SolutionDir)..\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(ProjectDir)Bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)Bin\$(PlatformTarget)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <GenerateManifest>false</GenerateManifest>
     <IntDir>$(SolutionDir)..\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <OutDir>$(ProjectDir)Bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)Bin\$(PlatformTarget)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <GenerateManifest>false</GenerateManifest>
@@ -127,12 +130,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <GenerateManifest>false</GenerateManifest>
-    <OutDir>$(ProjectDir)Bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)Bin\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <GenerateManifest>false</GenerateManifest>
-    <OutDir>$(ProjectDir)Bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)Bin\$(PlatformTarget)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -141,11 +144,13 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)\Private;$(ProjectDir)\Public;$(GeneratedFilesDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>COMMON_EXPORTS;_WINDOWS;WIN32;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <AdditionalDependencies>User32.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -154,11 +159,13 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)\Private;$(ProjectDir)\Public;$(GeneratedFilesDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>COMMON_EXPORTS;_WINDOWS;WIN32;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <AdditionalDependencies>User32.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
@@ -191,11 +198,13 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)\Private;$(ProjectDir)\Public;$(GeneratedFilesDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>COMMON_EXPORTS;_WINDOWS;WIN32;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <AdditionalDependencies>User32.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -204,11 +213,13 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)\Private;$(ProjectDir)\Public;$(GeneratedFilesDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>COMMON_EXPORTS;_WINDOWS;WIN32;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
+      <AdditionalDependencies>User32.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

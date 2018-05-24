@@ -1,4 +1,5 @@
-#include "Windows.h"
+#include "Platform.h"
+#include "MoREApp.h"
 
 int CALLBACK WinMain(
 	HINSTANCE hInstance,
@@ -7,5 +8,11 @@ int CALLBACK WinMain(
 	int       nCmdShow
 )
 {
-	return 0;
+	MoREApp app( hInstance );
+	if( !app.Init() )
+	{
+		return -1;
+	}
+
+	return app.Run();
 }
