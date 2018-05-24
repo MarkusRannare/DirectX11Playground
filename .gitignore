@@ -14,9 +14,11 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
+*.dll
 
 # Debug files
 *-Debug.*
+*.pdb
 
 # Compiled Static libraries
 *.lai
@@ -27,6 +29,7 @@
 # Executables
 *.out
 *.app
+*.exe
 
 # Visual studio files
 *.VC.db
