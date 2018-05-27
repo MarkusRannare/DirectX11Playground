@@ -31,6 +31,12 @@
     <ClInclude Include="Public\DxErr.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\Types.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\GameTimer.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Common.cpp">
@@ -40,6 +46,9 @@
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\DxErr.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\GameTimer.cpp">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>

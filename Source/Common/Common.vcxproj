@@ -23,12 +23,15 @@
     <ClInclude Include="Public\Common.h" />
     <ClInclude Include="Public\DX11Utils.h" />
     <ClInclude Include="Public\DxErr.h" />
+    <ClInclude Include="Public\GameTimer.h" />
+    <ClInclude Include="Public\Types.h" />
     <ClInclude Include="Public\MoREApp.h" />
     <ClInclude Include="Public\Platform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Common.cpp" />
     <ClCompile Include="Private\DxErr.cpp" />
+    <ClCompile Include="Private\GameTimer.cpp" />
     <ClCompile Include="Private\MoREApp.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -156,7 +159,8 @@
       <AdditionalDependencies>User32.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3d11.lib</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\$(PlatformTarget)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -175,7 +179,8 @@
       <AdditionalDependencies>User32.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3d11.lib</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\$(PlatformTarget)</AdditionalLibraryDirectories>
     </Lib>
     <ProjectReference>
@@ -221,7 +226,8 @@
       <AdditionalDependencies>User32.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3d11.lib</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\$(PlatformTarget)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
@@ -240,7 +246,8 @@
       <AdditionalDependencies>User32.lib;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3d11.lib</AdditionalDependencies>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\$(PlatformTarget)</AdditionalLibraryDirectories>
     </Lib>
     <ProjectReference>

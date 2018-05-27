@@ -2,6 +2,7 @@
 #include "Platform.h"
 #include "DX11Utils.h"
 #include <cassert>
+#include <sstream>
 
 static MoREApp* fmoREApp = nullptr;
 static std::wstring fWndClassName( TEXT("MoREWndClassName") );
@@ -20,6 +21,21 @@ LRESULT CALLBACK MoREApp::MsgProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 {
 	switch( msg )
 	{
+		// WM_ACTIVATE is sent when the window is activated or deactivated.  
+		// We pause the game when the window is deactivated and unpause it 
+		// when it becomes active. 
+		case WM_ACTIVATE:
+			if( LOWORD(wParam) == WA_INACTIVE )
+			{
+				mAppPaused = true;
+				mTimer.Stop();
+			}
+			else
+			{
+				mAppPaused = false;
+				mTimer.Start();
+			}
+			return 0;
 		// WM_DESTROY is sent when the window is being destroyed
 		case WM_DESTROY:
 			PostQuitMessage( 0 );
@@ -32,13 +48,13 @@ LRESULT CALLBACK MoREApp::MsgProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 			{
 				if( wParam == SIZE_MINIMIZED )
 				{
-					// @todo: Pause app
+					mAppPaused = true;
 					mMinimized = true;
 					mMaximized = true;
 				}
 				else if( wParam == SIZE_MAXIMIZED )
 				{
-					// @todo: Resume app
+					mAppPaused = false;
 					mMaximized = true;
 					mMinimized = false;
 					OnResize();
@@ -48,14 +64,14 @@ LRESULT CALLBACK MoREApp::MsgProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 					// Restoring from a minimized state
 					if( mMinimized )
 					{
-						// @todo: Resume app
+						mAppPaused = false;
 						mMinimized = false;
-						assert(mMaximized == false);
 						OnResize();
 					}
 					// Restoring from a maximized state
 					else if( mMaximized )
 					{
+						mAppPaused = false;
 						mMaximized = false;
 						OnResize();
 					}
@@ -80,14 +96,16 @@ LRESULT CALLBACK MoREApp::MsgProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 			return 0;
 		// WM_ENTERSIZEMOVE is sent when the user grabs the resize bars.
 		case WM_ENTERSIZEMOVE:
-			// @todo Pause app?
+			mAppPaused = true;
 			mResizing = true;
+			mTimer.Stop();
 			return 0;
 		// WM_EXITSIZEMOVE is sent when the user releases the resize bars.
 		// Here we reset everything based on the new window dimensions
 		case WM_EXITSIZEMOVE:
-			// @todo: Resume app?
+			mAppPaused = false;
 			mResizing = false;
+			mTimer.Start();
 			OnResize();
 			return 0;
 		// Catch this message so to prevent the window from becoming too small.
@@ -104,12 +122,17 @@ LRESULT CALLBACK MoREApp::MsgProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 
 MoREApp::MoREApp( HINSTANCE hInstance ) :
 	mHInstance( hInstance ),
+	mDesiredAdapter( nullptr ),
 	mWindowCaption( TEXT("MoRE =)") ),
 	mClientWidth( 800 ),
 	mClientHeight( 600 ),
+	mNumVideoAdapters( 0 ),
+	mNumMonitorsAttached( 0 ),
 	mMinimized( false ),
 	mMaximized( false ),
 	mResizing( false ),
+	mQuit( false ),
+	mAppPaused( false ),
 	mD3DDevice( nullptr ),
 	mD3DImmediateContext( nullptr ),
 	mSwapChain( nullptr ),
@@ -117,7 +140,8 @@ MoREApp::MoREApp( HINSTANCE hInstance ) :
 	mRenderTargetView( nullptr ),
 	mDepthStencilView( nullptr ),
 	m4xMsaaQuality( 0 ),
-	mEnable4xMSAA( false )
+	mEnable4xMSAA( false ),
+	mDisableAltEnter( false )
 {
 	assert( fmoREApp == nullptr && "Can only have one MoRE app" );
 	fmoREApp = this;
@@ -171,15 +195,18 @@ bool MoREApp::InitDirect3D()
 {
 	UINT CreateDeviceFlags = 0;
 
+	EnumerateAdapters();
+
 	// @todo: Make dependent on other preprocessor flag
 	#if defined(DEBUG) || defined(_DEBUG)
 		CreateDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 	#endif
 
+	assert( mDesiredAdapter != nullptr );
 	D3D_FEATURE_LEVEL featureLevel;
 	HRESULT Hr = D3D11CreateDevice(
-		0,							// Adapter
-		D3D_DRIVER_TYPE_HARDWARE,	// Driver type
+		mDesiredAdapter,			// Adapter
+		D3D_DRIVER_TYPE_UNKNOWN,	// Driver type ( https://msdn.microsoft.com/en-us/library/windows/desktop/ff476082(v=vs.85).aspx states that if Adapter is non-null, you then you need to pass driver type Unknown  )
 		0,							// Software device module
 		CreateDeviceFlags,			
 		0, 0,						// Feature level array
@@ -216,6 +243,7 @@ bool MoREApp::InitDirect3D()
 	SCD.BufferDesc.RefreshRate.Denominator = 1;
 	SCD.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	SCD.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;	// I can't find any useful information what this means
+	SCD.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 
 	if( mEnable4xMSAA )
 	{
@@ -251,6 +279,12 @@ bool MoREApp::InitDirect3D()
 
 	HR( DXGIFactory->CreateSwapChain( mD3DDevice, &SCD, &mSwapChain ) );
 
+	if( mDisableAltEnter )
+	{
+		// Prevent DXGI from monitor the application message queue
+		DXGIFactory->MakeWindowAssociation( mHWND, DXGI_MWA_NO_WINDOW_CHANGES );
+	}
+
 	ReleaseCOM( DXGIDevice );
 	ReleaseCOM( DXGIAdapter );
 	ReleaseCOM( DXGIFactory );
@@ -261,6 +295,47 @@ bool MoREApp::InitDirect3D()
 	OnResize();
 
 	return true;
+}
+
+void MoREApp::EnumerateAdapters()
+{	
+	// @todo: Make some kind of intelligent choice of what adapter to use? Like, prefer non intel adapter if possible,
+	// as intel adapters tends to be the slower ones when you have multiple ones installed
+
+	IDXGIFactory* Factory = nullptr;
+	HR( CreateDXGIFactory( __uuidof(IDXGIFactory), (void**)&Factory) );
+
+	int AdapterIdx = 0;
+	mNumVideoAdapters = 0;
+
+	IDXGIAdapter* Adapter = nullptr;
+	while( Factory->EnumAdapters( AdapterIdx++, &Adapter ) != DXGI_ERROR_NOT_FOUND )
+	{
+		LARGE_INTEGER Version;
+		if( Adapter->CheckInterfaceSupport( __uuidof(ID3D11Device), &Version ) )
+		{
+			++mNumVideoAdapters;
+
+			// First and default adapter, select it as our desired adapter
+			if( mDesiredAdapter == nullptr )
+			{
+				mDesiredAdapter = Adapter;
+
+				int MonitorIdx = 0;
+				mNumMonitorsAttached = 0;
+
+				IDXGIOutput* Monitor = nullptr;
+				while( Adapter->EnumOutputs( MonitorIdx++, &Monitor ) != DXGI_ERROR_NOT_FOUND )
+				{
+					++mNumMonitorsAttached;
+				}
+			}
+		}
+	}
+
+	// We need atleast one monitor attached to be able to render anything
+	assert(mNumMonitorsAttached > 0);
+	ReleaseCOM(Factory);
 }
 
 void MoREApp::OnResize()
@@ -314,7 +389,6 @@ void MoREApp::OnResize()
 	mD3DImmediateContext->OMSetRenderTargets(1, &mRenderTargetView, mDepthStencilView );
 
 	// Set the viewport transform
-
 	mScreenViewport.TopLeftX	= 0;
 	mScreenViewport.TopLeftY	= 0;
 	mScreenViewport.Width		= static_cast<float>(mClientWidth);
@@ -340,19 +414,94 @@ bool MoREApp::Init()
 	return true;
 }
 
-int MoREApp::Run()
+void MoREApp::ProcessMessageQueue()
 {
 	MSG Msg = {0};
-	
-	while( Msg.message != WM_QUIT )
+
+	// If there are Window messages then process them, if WM_QUIT is posted, abort the message loop
+	while( PeekMessage( &Msg, 0, 0, 0, PM_REMOVE ) && Msg.message != WM_QUIT )
 	{
-		// If there are Window messages then process them.
-		if( PeekMessage( &Msg, 0, 0, 0, PM_REMOVE ) )
+		TranslateMessage( &Msg );
+		DispatchMessage( &Msg );
+	}
+
+	if( Msg.message == WM_QUIT )
+	{
+		mQuit = true;
+	}
+}
+
+void MoREApp::CalculateFrameStats()
+{
+	// Code computes the average frames per second, and also the 
+	// average time it takes to render one frame.  These stats 
+	// are appended to the window caption bar.
+
+	static int FrameCnt = 0;
+	static float TimeElapsed = 0.0f;
+
+	FrameCnt++;
+
+	// Compute averages over one second period.
+	if( (mTimer.TotalTime() - TimeElapsed) >= 1.0f )
+	{
+		float FPS = (float)FrameCnt; // fps = frameCnt / 1
+		float MSPF = 1000.0f / FPS;
+
+		std::wostringstream Outs;
+		Outs.precision( 8 );
+		Outs << mWindowCaption << L"    "
+			<< L"FPS: " << FPS << L"    "
+			<< L"Frame Time: " << MSPF << L" (ms)";
+		SetWindowText( mHWND, Outs.str().c_str() );
+
+		// Reset for next average.
+		FrameCnt = 0;
+		TimeElapsed += 1.0f;
+	}
+}
+
+void MoREApp::UpdateScene( double DeltaTime )
+{
+}
+
+void MoREApp::DrawScene()
+{
+	assert(mD3DImmediateContext);
+	assert(mSwapChain);
+
+	mD3DImmediateContext->ClearRenderTargetView( mRenderTargetView, reinterpret_cast<const float*>(&Colors::Blue) );
+	mD3DImmediateContext->ClearDepthStencilView( mDepthStencilView,  D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
+
+	HR( mSwapChain->Present( 0, 0 ) );
+}
+
+int MoREApp::Run()
+{
+	mTimer.Reset();
+	
+	while( !mQuit )
+	{
+		ProcessMessageQueue();
+
+		mTimer.Tick();
+
+		// ProcessMessageQueue might set mQuit to true, so check for it here
+		if( !mAppPaused && !mQuit )
 		{
-			TranslateMessage( &Msg );
-			DispatchMessage( &Msg );
+			CalculateFrameStats();
+			UpdateScene( mTimer.DeltaTime() );
+			DrawScene();
+
+			// Let other processes have a timeslice to not make the system unresponsive
+			Sleep(0);
+		}
+		else
+		{
+			Sleep(100);
 		}
 	}
+	
 
 	return -1;
 }
