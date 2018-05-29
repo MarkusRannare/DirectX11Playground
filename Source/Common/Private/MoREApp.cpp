@@ -231,6 +231,7 @@ bool MoREApp::InitDirect3D()
 		return false;
 	}
 
+	// @todo: Store current feature level and disable some effects depending on the feature level or do them differently
 	/*if( featureLevel != D3D_FEATURE_LEVEL_11_0 )
 	{
 		MessageBox( 0, TEXT("Graphics Processessor with DirectX 11 support required for MoRE"), 0, 0 );

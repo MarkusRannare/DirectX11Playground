@@ -1,14 +1,14 @@
-#include "Example1App.h"
+#include "Example2App.h"
 #include "DX11Utils.h"
 #include <string>
 
-Example1App::Example1App( HINSTANCE hInstance ) :
+Example2App::Example2App( HINSTANCE hInstance ) :
 	MoREApp( hInstance )
 {
-	mWindowCaption = std::wstring(TEXT("Example 1 - MoRE"));
+	mWindowCaption = std::wstring( TEXT( "Example 2 - MoRE" ) );
 }
 
-void Example1App::DrawScene()
+void Example2App::DrawScene()
 {
 	MoREApp::DrawScene();
 
