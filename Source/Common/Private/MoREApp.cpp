@@ -202,6 +202,15 @@ bool MoREApp::InitDirect3D()
 		CreateDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 	#endif
 
+	// @todo: Add support for the application to disable Dx10 support
+	const D3D_FEATURE_LEVEL SupportedFeatureLevels[] =
+	{
+		D3D_FEATURE_LEVEL_11_0,
+		D3D_FEATURE_LEVEL_10_1,
+		D3D_FEATURE_LEVEL_10_0
+	};
+	const int NumSupportedFeatureLevels = sizeof( SupportedFeatureLevels ) / sizeof( D3D_FEATURE_LEVEL );
+
 	assert( mDesiredAdapter != nullptr );
 	D3D_FEATURE_LEVEL featureLevel;
 	HRESULT Hr = D3D11CreateDevice(
@@ -209,7 +218,8 @@ bool MoREApp::InitDirect3D()
 		D3D_DRIVER_TYPE_UNKNOWN,	// Driver type ( https://msdn.microsoft.com/en-us/library/windows/desktop/ff476082(v=vs.85).aspx states that if Adapter is non-null, you then you need to pass driver type Unknown  )
 		0,							// Software device module
 		CreateDeviceFlags,			
-		0, 0,						// Feature level array
+		SupportedFeatureLevels,		
+		NumSupportedFeatureLevels,	
 		D3D11_SDK_VERSION,			
 		&mD3DDevice,				// OUT, created device
 		&featureLevel,				// OUT, feature level created on
@@ -221,11 +231,11 @@ bool MoREApp::InitDirect3D()
 		return false;
 	}
 
-	if( featureLevel != D3D_FEATURE_LEVEL_11_0 )
+	/*if( featureLevel != D3D_FEATURE_LEVEL_11_0 )
 	{
 		MessageBox( 0, TEXT("Graphics Processessor with DirectX 11 support required for MoRE"), 0, 0 );
 		return false;
-	}
+	}*/
 
 	// Check 4X MSAA quality support for our back buffer format.
 	// All Direct3D 11 capable devices support 4X MSAA for all render 
@@ -467,13 +477,6 @@ void MoREApp::UpdateScene( double DeltaTime )
 
 void MoREApp::DrawScene()
 {
-	assert(mD3DImmediateContext);
-	assert(mSwapChain);
-
-	mD3DImmediateContext->ClearRenderTargetView( mRenderTargetView, reinterpret_cast<const float*>(&Colors::Blue) );
-	mD3DImmediateContext->ClearDepthStencilView( mDepthStencilView,  D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0 );
-
-	HR( mSwapChain->Present( 0, 0 ) );
 }
 
 int MoREApp::Run()

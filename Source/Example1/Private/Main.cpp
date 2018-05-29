@@ -1,5 +1,5 @@
 #include "Platform.h"
-#include "MoREApp.h"
+#include "Example1App.h"
 
 int CALLBACK WinMain(
 	HINSTANCE hInstance,
@@ -8,7 +8,7 @@ int CALLBACK WinMain(
 	int       nCmdShow
 )
 {
-	MoREApp app( hInstance );
+	Example1App app( hInstance );
 	if( !app.Init() )
 	{
 		return -1;
