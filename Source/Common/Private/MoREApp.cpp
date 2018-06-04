@@ -3,6 +3,7 @@
 #include "DX11Utils.h"
 #include <cassert>
 #include <sstream>
+#include <DirectXMath.h>
 
 static MoREApp* fmoREApp = nullptr;
 static std::wstring fWndClassName( TEXT("MoREWndClassName") );
@@ -114,7 +115,21 @@ LRESULT CALLBACK MoREApp::MsgProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 			((MINMAXINFO*)lParam)->ptMinTrackSize.x = 400;
 			((MINMAXINFO*)lParam)->ptMinTrackSize.y = 400;
 			return 0;
+		case WM_LBUTTONDOWN:
+		case WM_RBUTTONDOWN:
+		case WM_MBUTTONDOWN:
+			OnMouseDown( wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+			return 0;
+		
+		case WM_LBUTTONUP:
+		case WM_RBUTTONUP:
+		case WM_MBUTTONUP:
+			OnMouseUp( wParam, GET_X_LPARAM( lParam ), GET_Y_LPARAM( lParam ) );
+			return 0;
 
+		case WM_MOUSEMOVE:
+			OnMouseMove( wParam, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) );
+			return 0;
 	}
 
 	return DefWindowProc( hwnd, msg, wParam, lParam );
@@ -412,6 +427,12 @@ void MoREApp::OnResize()
 
 bool MoREApp::Init()
 {
+	if( !DirectX::XMVerifyCPUSupport() )
+	{
+		MessageBox( 0, TEXT( "MoRE requires SSE2 support to properly function" ), 0, 0 );
+		return false;
+	}
+
 	if( !InitWindow() )
 	{
 		return false;

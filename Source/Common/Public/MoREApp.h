@@ -28,6 +28,10 @@ protected:
 	virtual void UpdateScene( double DeltaTime );
 	virtual void DrawScene();
 
+	virtual void OnMouseDown( WPARAM BtnState, int x, int y ) {}
+	virtual void OnMouseUp( WPARAM BtnState, int x, int y ) {}
+	virtual void OnMouseMove( WPARAM BtnState, int x, int y ) {}
+
 	void ProcessMessageQueue();
 	void CalculateFrameStats();
 
