@@ -345,6 +345,18 @@ void MoREApp::EnumerateAdapters()
 			// First and default adapter, select it as our desired adapter
 			if( mDesiredAdapter == nullptr )
 			{
+				// Testcode to skip intel graphics cards
+				// @todo: Set this as low prio card, so that we can select desired other card as preferred
+				// instead if the user has a NVidia/ATI card also installed
+				/*DXGI_ADAPTER_DESC Desc;
+				Adapter->GetDesc( &Desc );
+				OutputDebugString( Desc.Description );
+
+				if( wcsstr( Desc.Description, TEXT("Intel(R)") ) != nullptr )
+				{
+					continue;
+				}*/
+
 				mDesiredAdapter = Adapter;
 
 				int MonitorIdx = 0;
@@ -359,8 +371,9 @@ void MoREApp::EnumerateAdapters()
 		}
 	}
 
-	// We need atleast one monitor attached to be able to render anything
-	assert(mNumMonitorsAttached > 0);
+	// Case of laptop, then the intel card might have the monitor attached, while the NVidia card just does all
+	// the rendering
+	//assert(mNumMonitorsAttached > 0);
 	ReleaseCOM(Factory);
 }
 
@@ -529,4 +542,9 @@ int MoREApp::Run()
 	
 
 	return -1;
+}
+
+float MoREApp::AspectRatio() const
+{
+	return mClientWidth / (float)mClientHeight;
 }

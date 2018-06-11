@@ -15,7 +15,10 @@ class MoREApp
 public:
 	MoREApp( HINSTANCE hInstance );
 
-	bool Init();
+	virtual bool Init();
+
+	// Get the aspect ratio of the window
+	float AspectRatio() const;
 
 	int Run();
 protected:

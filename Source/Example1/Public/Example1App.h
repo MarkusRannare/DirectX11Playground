@@ -7,6 +7,6 @@ class Example1App : public MoREApp
 public:
 	Example1App( HINSTANCE hInstance );
 
-	virtual void DrawScene();
+	virtual void DrawScene() override;
 private:
 };
