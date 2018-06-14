@@ -2,12 +2,11 @@
 
 #include "MoREApp.h"
 #include <DirectXMath.h>
-#include <DirectXPackedVector.h>
 
 struct Vertex
 {
 	DirectX::XMFLOAT3 Pos;
-	DirectX::PackedVector::XMCOLOR Color;
+	DirectX::XMFLOAT4 Color;
 };
 
 struct VS_ConstantBuffer
@@ -15,11 +14,11 @@ struct VS_ConstantBuffer
 	DirectX::XMFLOAT4X4 WorldViewProj;
 };
 
-class Example2App : public MoREApp
+class Example3App : public MoREApp
 {
 public:
-	Example2App( HINSTANCE hInstance );
-	~Example2App();
+	Example3App( HINSTANCE hInstance );
+	~Example3App();
 
 	virtual bool Init() override;
 

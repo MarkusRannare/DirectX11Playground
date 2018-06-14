@@ -37,6 +37,12 @@
     <ClInclude Include="Public\GameTimer.h">
       <Filter>Public</Filter>
     </ClInclude>
+    <ClInclude Include="Public\MoFile.h">
+      <Filter>Public</Filter>
+    </ClInclude>
+    <ClInclude Include="Public\MoMath.h">
+      <Filter>Public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Private\Common.cpp">
@@ -49,6 +55,9 @@
       <Filter>Private</Filter>
     </ClCompile>
     <ClCompile Include="Private\GameTimer.cpp">
+      <Filter>Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\MoFile.cpp">
       <Filter>Private</Filter>
     </ClCompile>
   </ItemGroup>

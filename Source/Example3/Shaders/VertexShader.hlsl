@@ -22,7 +22,7 @@ VertexOut main( VertexIn Vin )
     VertexOut Out;
 
     Out.PosH = mul(float4(Vin.Pos, 1.0f), gWorldViewProj);
-	Out.Color = float4( Vin.Color.rgb, 1.0f );
+	Out.Color = Vin.Color;
 
 	return Out;
 }

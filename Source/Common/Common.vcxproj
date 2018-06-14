@@ -24,6 +24,8 @@
     <ClInclude Include="Public\DX11Utils.h" />
     <ClInclude Include="Public\DxErr.h" />
     <ClInclude Include="Public\GameTimer.h" />
+    <ClInclude Include="Public\MoFile.h" />
+    <ClInclude Include="Public\MoMath.h" />
     <ClInclude Include="Public\Types.h" />
     <ClInclude Include="Public\MoREApp.h" />
     <ClInclude Include="Public\Platform.h" />
@@ -32,6 +34,7 @@
     <ClCompile Include="Private\Common.cpp" />
     <ClCompile Include="Private\DxErr.cpp" />
     <ClCompile Include="Private\GameTimer.cpp" />
+    <ClCompile Include="Private\MoFile.cpp" />
     <ClCompile Include="Private\MoREApp.cpp" />
   </ItemGroup>
   <ItemGroup>

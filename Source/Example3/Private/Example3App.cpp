@@ -1,10 +1,17 @@
-#include "Example2App.h"
+#include "Example3App.h"
 #include "DX11Utils.h"
 #include <string>
 #include "MoMath.h"
 #include "MoFile.h"
 
-Example2App::Example2App( HINSTANCE hInstance ) :
+// @todo: Make a MoMath.h
+template<typename T>
+T Clamp( T Val, T MinVal, T MaxVal )
+{
+	return max( min( Val, MaxVal ), MinVal );
+}
+
+Example3App::Example3App( HINSTANCE hInstance ) :
 	MoREApp( hInstance ),
 	mPhi( 0.25f * (float)M_PI ),
 	mTheta( 1.5f * (float)M_PI ),
@@ -15,7 +22,7 @@ Example2App::Example2App( HINSTANCE hInstance ) :
 	mInputLayout( nullptr ),
 	mVertexShaderBytecode( nullptr )
 {
-	mWindowCaption = std::wstring( TEXT( "Example 2 - MoRE" ) );
+	mWindowCaption = std::wstring( TEXT( "Example 3 - MoRE" ) );
 
 	mLastMousePos.x = 0;
 	mLastMousePos.y = 0;
@@ -26,7 +33,7 @@ Example2App::Example2App( HINSTANCE hInstance ) :
 	DirectX::XMStoreFloat4x4( &mProj, Ident );
 }
 
-Example2App::~Example2App()
+Example3App::~Example3App()
 {
 	ReleaseCOM(mConstantBuffer);
 	ReleaseCOM(mRasterState);
@@ -36,7 +43,7 @@ Example2App::~Example2App()
 	ReleaseCOM(mBoxIB);
 }
 
-bool Example2App::Init()
+bool Example3App::Init()
 {
 	if( !MoREApp::Init() )
 	{
@@ -83,7 +90,7 @@ bool Example2App::Init()
 	return true;
 }
 
-void Example2App::CreateConstantBuffer()
+void Example3App::CreateConstantBuffer()
 {
 	// Setup constant buffer
 	D3D11_BUFFER_DESC CBDesc;
@@ -97,7 +104,7 @@ void Example2App::CreateConstantBuffer()
 	HR( mD3DDevice->CreateBuffer( &CBDesc, nullptr, &mConstantBuffer ) );
 }
 
-void Example2App::OnResize()
+void Example3App::OnResize()
 {
 	MoREApp::OnResize();
 
@@ -111,7 +118,7 @@ void Example2App::OnResize()
 	XMStoreFloat4x4( &mProj, Proj );
 }
 
-void Example2App::DrawScene()
+void Example3App::DrawScene()
 {
 	MoREApp::DrawScene();
 
@@ -127,7 +134,7 @@ void Example2App::DrawScene()
 	UINT Stride = sizeof(Vertex);
 	UINT Offset = 0;
 	mD3DImmediateContext->IASetVertexBuffers( 0, 1, &mBoxVB, &Stride, &Offset );
-	mD3DImmediateContext->IASetIndexBuffer( mBoxIB, DXGI_FORMAT_R16_UINT, 0 );
+	mD3DImmediateContext->IASetIndexBuffer( mBoxIB, DXGI_FORMAT_R32_UINT, 0 );
 
 	DirectX::XMMATRIX World = DirectX::XMLoadFloat4x4( &mWorld );
 	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4( &mView );
@@ -157,7 +164,7 @@ void Example2App::DrawScene()
 	HR( mSwapChain->Present( 0, 0 ) );
 }
 
-void Example2App::UpdateScene( double DeltaTime )
+void Example3App::UpdateScene( double DeltaTime )
 {
 	MoREApp::UpdateScene( DeltaTime );
 
@@ -175,20 +182,19 @@ void Example2App::UpdateScene( double DeltaTime )
 	DirectX::XMStoreFloat4x4( &mView, View );
 }
 
-void Example2App::BuildGeometryBuffers()
+void Example3App::BuildGeometryBuffers()
 {
-	// @todo: Do something more gracius about this. Althrough gives the correct result, we have the data in the wrong component in the XMCOLOR
 	// Create vertex buffer
 	Vertex Vertices[] =
 	{
-		{ DirectX::XMFLOAT3( -1.0f, -1.0f, -1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::White ) )		},
-		{ DirectX::XMFLOAT3( -1.0f, +1.0f, -1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Black ) )		},
-		{ DirectX::XMFLOAT3( +1.0f, +1.0f, -1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Red ) )		},
-		{ DirectX::XMFLOAT3( +1.0f, -1.0f, -1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Green ) )		},
-		{ DirectX::XMFLOAT3( -1.0f, -1.0f, +1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Blue ) )		},
-		{ DirectX::XMFLOAT3( -1.0f, +1.0f, +1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Yellow ) )		},
-		{ DirectX::XMFLOAT3( +1.0f, +1.0f, +1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Cyan ) )		},
-		{ DirectX::XMFLOAT3( +1.0f, -1.0f, +1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Magenta ) )	}
+		{ DirectX::XMFLOAT3( -1.0f, -1.0f, -1.0f), DirectX::XMFLOAT4( (const float*)&Colors::White )	},
+		{ DirectX::XMFLOAT3( -1.0f, +1.0f, -1.0f ), DirectX::XMFLOAT4( (const float*)&Colors::Black )	},
+		{ DirectX::XMFLOAT3( +1.0f, +1.0f, -1.0f ), DirectX::XMFLOAT4( (const float*)&Colors::Red )		},
+		{ DirectX::XMFLOAT3( +1.0f, -1.0f, -1.0f ), DirectX::XMFLOAT4( (const float*)&Colors::Green )	},
+		{ DirectX::XMFLOAT3( -1.0f, -1.0f, +1.0f ), DirectX::XMFLOAT4( (const float*)&Colors::Blue )	},
+		{ DirectX::XMFLOAT3( -1.0f, +1.0f, +1.0f ), DirectX::XMFLOAT4( (const float*)&Colors::Yellow )	},
+		{ DirectX::XMFLOAT3( +1.0f, +1.0f, +1.0f ), DirectX::XMFLOAT4( (const float*)&Colors::Cyan )	},
+		{ DirectX::XMFLOAT3( +1.0f, -1.0f, +1.0f ), DirectX::XMFLOAT4( (const float*)&Colors::Magenta ) }
 	};
 
 	D3D11_BUFFER_DESC VBD;
@@ -203,7 +209,7 @@ void Example2App::BuildGeometryBuffers()
 	HR(mD3DDevice->CreateBuffer( &VBD, &VInitData, &mBoxVB ) );
 
 	// Create the index buffer
-	unsigned short Indices[] =
+	UINT Indices[] =
 	{
 		// Front face
 		0, 1, 2,
@@ -227,7 +233,7 @@ void Example2App::BuildGeometryBuffers()
 
 	D3D11_BUFFER_DESC IBD;
 	IBD.Usage = D3D11_USAGE_IMMUTABLE;
-	IBD.ByteWidth = 36 * sizeof(unsigned short);
+	IBD.ByteWidth = 36 * sizeof(UINT);
 	IBD.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	IBD.CPUAccessFlags = 0;
 	IBD.MiscFlags = 0;
@@ -238,19 +244,19 @@ void Example2App::BuildGeometryBuffers()
 	HR( mD3DDevice->CreateBuffer( &IBD, &IInitData, &mBoxIB ) );
 }
 
-void Example2App::BuildShaders()
+void Example3App::BuildShaders()
 {
 	assert(mD3DDevice);
 
 	assert(mVertexShaderBytecode == nullptr);
-	bool ReadFileResult = MoRE::ReadFileContent( "..\\..\\Example2\\ShaderBinaries\\VertexShader.cso", "rb", &mVertexShaderBytecode, mVertexShaderBytecodeSize );
+	bool ReadFileResult = MoRE::ReadFileContent( "..\\..\\Example3\\ShaderBinaries\\VertexShader.cso", "rb", &mVertexShaderBytecode, mVertexShaderBytecodeSize );
 	assert(ReadFileResult);
 
 	HR( mD3DDevice->CreateVertexShader( mVertexShaderBytecode, mVertexShaderBytecodeSize, nullptr, &mVertexShader ) );
 
 	long PixelShaderSize = 0;
 	char* PixelShaderBytecode = nullptr;
-	ReadFileResult = MoRE::ReadFileContent( "..\\..\\Example2\\ShaderBinaries\\PixelShader.cso", "rb", &PixelShaderBytecode, PixelShaderSize );
+	ReadFileResult = MoRE::ReadFileContent( "..\\..\\Example3\\ShaderBinaries\\PixelShader.cso", "rb", &PixelShaderBytecode, PixelShaderSize );
 	assert(ReadFileResult);
 
 	HR( mD3DDevice->CreatePixelShader( PixelShaderBytecode, PixelShaderSize, nullptr, &mPixelShader ) );
@@ -258,13 +264,13 @@ void Example2App::BuildShaders()
 	delete[] PixelShaderBytecode;
 }
 
-void Example2App::BuildVertexLayout()
+void Example3App::BuildVertexLayout()
 {
 	// Create the vertex input layout
 	D3D11_INPUT_ELEMENT_DESC VertexDesc[] =
 	{
 		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0, },
-		{ "COLOR",		0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	// Create the input layout
@@ -277,7 +283,7 @@ void Example2App::BuildVertexLayout()
 	mVertexShaderBytecodeSize = -1;
 }
 
-void Example2App::OnMouseMove( WPARAM BtnState, int x, int y )
+void Example3App::OnMouseMove( WPARAM BtnState, int x, int y )
 {
 	if( (BtnState & MK_LBUTTON) != 0 )
 	{
@@ -287,7 +293,7 @@ void Example2App::OnMouseMove( WPARAM BtnState, int x, int y )
 		mTheta += DX;
 		mPhi += DY;
 
-		mPhi = MoRE::Clamp( mPhi, 0.1f, (float)M_PI - 0.1f );
+		mPhi = Clamp( mPhi, 0.1f, (float)M_PI - 0.1f );
 	}
 	else if( (BtnState & MK_RBUTTON) != 0 )
 	{
@@ -296,14 +302,14 @@ void Example2App::OnMouseMove( WPARAM BtnState, int x, int y )
 
 		mRadius += DX - DY;
 
-		mRadius = MoRE::Clamp( mRadius, 3.0f, 15.0f );
+		mRadius = Clamp( mRadius, 3.0f, 15.0f );
 	}
 
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
 }
 
-void Example2App::OnMouseDown( WPARAM BtnState, int x, int y )
+void Example3App::OnMouseDown( WPARAM BtnState, int x, int y )
 {
 	mLastMousePos.x = x;
 	mLastMousePos.y = y;
@@ -311,7 +317,7 @@ void Example2App::OnMouseDown( WPARAM BtnState, int x, int y )
 	SetCapture(mHWND);
 }
 
-void Example2App::OnMouseUp( WPARAM BtnState, int x, int y )
+void Example3App::OnMouseUp( WPARAM BtnState, int x, int y )
 {
 	ReleaseCapture();
 }
