@@ -2,11 +2,12 @@
 
 #include "MoREApp.h"
 #include <DirectXMath.h>
+#include <DirectXPackedVector.h>
 
 struct Vertex
 {
 	DirectX::XMFLOAT3 Pos;
-	DirectX::XMFLOAT4 Color;
+	DirectX::PackedVector::XMCOLOR Color;
 };
 
 struct VS_ConstantBuffer
@@ -18,7 +19,7 @@ class Example3App : public MoREApp
 {
 public:
 	Example3App( HINSTANCE hInstance );
-	~Example3App();
+	virtual ~Example3App();
 
 	virtual bool Init() override;
 
@@ -29,6 +30,8 @@ public:
 	virtual void OnMouseUp( WPARAM BtnState, int x, int y ) override;
 	virtual void OnMouseDown( WPARAM BtnState, int x, int y ) override;
 protected:
+	float GetHeight( float X, float Z ) const;
+
 	virtual void OnResize() override;
 
 	void CreateConstantBuffer();
@@ -48,10 +51,11 @@ private:
 	float mTheta;
 	float mRadius;
 
-	// Box variables
-	struct ID3D11Buffer* mBoxVB;
-	struct ID3D11Buffer* mBoxIB;
+	// Landscape variables
+	struct ID3D11Buffer* mLandscapeVB;
+	struct ID3D11Buffer* mLandscapeIB;
 	struct ID3D11Buffer* mConstantBuffer;
+	UINT mNumIndices;
 
 	// Shader variables
 	struct ID3D11RasterizerState* mRasterState;

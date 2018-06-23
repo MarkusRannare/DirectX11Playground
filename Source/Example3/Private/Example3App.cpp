@@ -3,19 +3,16 @@
 #include <string>
 #include "MoMath.h"
 #include "MoFile.h"
+#include "GeometryGenerator.h"
 
-// @todo: Make a MoMath.h
-template<typename T>
-T Clamp( T Val, T MinVal, T MaxVal )
-{
-	return max( min( Val, MaxVal ), MinVal );
-}
+using namespace MoRE;
+using namespace DirectX;
 
 Example3App::Example3App( HINSTANCE hInstance ) :
 	MoREApp( hInstance ),
-	mPhi( 0.25f * (float)M_PI ),
-	mTheta( 1.5f * (float)M_PI ),
-	mRadius( 7.0f ),
+	mPhi( 0.45f * (float)Math::Pi ),
+	mTheta( 1.5f * (float)Math::Pi ),
+	mRadius( 75.0f ),
 	mRasterState( nullptr ),
 	mVertexShader( nullptr ),
 	mPixelShader( nullptr ),
@@ -35,12 +32,15 @@ Example3App::Example3App( HINSTANCE hInstance ) :
 
 Example3App::~Example3App()
 {
+	// @todo: Make some cleaner way of cleaning up resources, right now it's error prone!
+	ReleaseCOM(mPixelShader);
+	ReleaseCOM(mDepthStencilState);
 	ReleaseCOM(mConstantBuffer);
 	ReleaseCOM(mRasterState);
 	ReleaseCOM(mInputLayout);
 	ReleaseCOM(mVertexShader);
-	ReleaseCOM(mBoxVB);
-	ReleaseCOM(mBoxIB);
+	ReleaseCOM(mLandscapeVB);
+	ReleaseCOM(mLandscapeIB);
 }
 
 bool Example3App::Init()
@@ -91,7 +91,7 @@ bool Example3App::Init()
 }
 
 void Example3App::CreateConstantBuffer()
-{
+{	
 	// Setup constant buffer
 	D3D11_BUFFER_DESC CBDesc;
 	CBDesc.ByteWidth = sizeof( VS_ConstantBuffer );
@@ -108,10 +108,9 @@ void Example3App::OnResize()
 {
 	MoREApp::OnResize();
 
-	// @todo: Make a portable version of M_PI
 	// @todo: Make NearZ and FarZ config variables
 	DirectX::XMMATRIX Proj = DirectX::XMMatrixPerspectiveFovLH( 
-		0.25f * (float)M_PI,
+		0.25f * (float)Math::Pi,
 		AspectRatio(),
 		1.0f, // NearZ
 		1000.0f ); // FarZ
@@ -133,8 +132,8 @@ void Example3App::DrawScene()
 
 	UINT Stride = sizeof(Vertex);
 	UINT Offset = 0;
-	mD3DImmediateContext->IASetVertexBuffers( 0, 1, &mBoxVB, &Stride, &Offset );
-	mD3DImmediateContext->IASetIndexBuffer( mBoxIB, DXGI_FORMAT_R32_UINT, 0 );
+	mD3DImmediateContext->IASetVertexBuffers( 0, 1, &mLandscapeVB, &Stride, &Offset );
+	mD3DImmediateContext->IASetIndexBuffer( mLandscapeIB, DXGI_FORMAT_R32_UINT, 0 );
 
 	DirectX::XMMATRIX World = DirectX::XMLoadFloat4x4( &mWorld );
 	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4( &mView );
@@ -159,7 +158,7 @@ void Example3App::DrawScene()
 
 	mD3DImmediateContext->RSSetState( mRasterState );
 	mD3DImmediateContext->OMSetDepthStencilState( mDepthStencilState, 0 );
-	mD3DImmediateContext->DrawIndexed( 36, 0, 0 );
+	mD3DImmediateContext->DrawIndexed( mNumIndices, 0, 0 );
 
 	HR( mSwapChain->Present( 0, 0 ) );
 }
@@ -182,66 +181,77 @@ void Example3App::UpdateScene( double DeltaTime )
 	DirectX::XMStoreFloat4x4( &mView, View );
 }
 
+float Example3App::GetHeight( float X, float Z ) const
+{
+	return 0.3f * ( Z * sinf( 0.1f * X ) + X * cosf( 0.1f * Z ) );
+}
+
 void Example3App::BuildGeometryBuffers()
 {
-	// Create vertex buffer
-	Vertex Vertices[] =
+	GeometryGenerator::MeshData LandscapeMesh;
+	GeometryGenerator::CreateGrid( 160.0f, 160.0f, 50, 50, LandscapeMesh );
+
+	std::vector<Vertex> Vertices;
+	Vertices.resize( LandscapeMesh.Vertices.size() );
+	for( UINT VerticeIdx = 0; VerticeIdx < LandscapeMesh.Vertices.size(); ++VerticeIdx )
 	{
-		{ DirectX::XMFLOAT3( -1.0f, -1.0f, -1.0f), DirectX::XMFLOAT4( (const float*)&Colors::White )	},
-		{ DirectX::XMFLOAT3( -1.0f, +1.0f, -1.0f ), DirectX::XMFLOAT4( (const float*)&Colors::Black )	},
-		{ DirectX::XMFLOAT3( +1.0f, +1.0f, -1.0f ), DirectX::XMFLOAT4( (const float*)&Colors::Red )		},
-		{ DirectX::XMFLOAT3( +1.0f, -1.0f, -1.0f ), DirectX::XMFLOAT4( (const float*)&Colors::Green )	},
-		{ DirectX::XMFLOAT3( -1.0f, -1.0f, +1.0f ), DirectX::XMFLOAT4( (const float*)&Colors::Blue )	},
-		{ DirectX::XMFLOAT3( -1.0f, +1.0f, +1.0f ), DirectX::XMFLOAT4( (const float*)&Colors::Yellow )	},
-		{ DirectX::XMFLOAT3( +1.0f, +1.0f, +1.0f ), DirectX::XMFLOAT4( (const float*)&Colors::Cyan )	},
-		{ DirectX::XMFLOAT3( +1.0f, -1.0f, +1.0f ), DirectX::XMFLOAT4( (const float*)&Colors::Magenta ) }
-	};
+		Vertex& Vert = Vertices[VerticeIdx];
+		const XMFLOAT3& Pos = LandscapeMesh.Vertices[VerticeIdx].Position;
+		Vert.Pos = XMFLOAT3( Pos.x, GetHeight( Pos.x, Pos.z ), Pos.z );
+	
+		// @todo: Creating colors and sending them to the GPU should be considerable easier
+		if( Vert.Pos.y < -10.0f )
+		{
+			// Sandy beach color
+			Vert.Color = Math::ArgbToAbgr(PackedVector::XMCOLOR((const float*)&XMFLOAT4(1.0f, 0.96f, 0.62f, 1.0f)));
+		}
+		else if( Vert.Pos.y < 5.0f )
+		{
+			// Light yellow color
+			Vert.Color = Math::ArgbToAbgr(PackedVector::XMCOLOR((const float*)&XMFLOAT4(0.48f, 0.77f, 0.46f, 1.0f)));
+		}
+		else if (Vert.Pos.y < 12.0f)
+		{
+			// Dark yellow color
+			Vert.Color = Math::ArgbToAbgr(PackedVector::XMCOLOR((const float*)&XMFLOAT4(0.1f, 0.48f, 0.19f, 1.0f)));
+		}
+		else if (Vert.Pos.y < 20.0f)
+		{
+			// Dark brown color
+			Vert.Color = Math::ArgbToAbgr(PackedVector::XMCOLOR((const float*)&XMFLOAT4(0.45f, 0.39f, 0.34f, 1.0f)));
+		}
+		else
+		{
+			// White color
+			Vert.Color = Math::ArgbToAbgr(PackedVector::XMCOLOR((const float*)&XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f)));
+		}
+		
+	}
 
 	D3D11_BUFFER_DESC VBD;
 	VBD.Usage = D3D11_USAGE_IMMUTABLE;
-	VBD.ByteWidth = sizeof(Vertex) * 8;
+	VBD.ByteWidth = sizeof(Vertex) * (UINT)LandscapeMesh.Vertices.size();
 	VBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	VBD.CPUAccessFlags = 0;
 	VBD.MiscFlags = 0;
 	VBD.StructureByteStride = 0;
 	D3D11_SUBRESOURCE_DATA VInitData;
-	VInitData.pSysMem = Vertices;
-	HR(mD3DDevice->CreateBuffer( &VBD, &VInitData, &mBoxVB ) );
-
-	// Create the index buffer
-	UINT Indices[] =
-	{
-		// Front face
-		0, 1, 2,
-		0, 2, 3,
-		// Back face
-		4, 6, 5,
-		4, 7, 6,
-		// Left face
-		4, 5, 1,
-		4, 1, 0,
-		// Right face
-		3, 2, 6,
-		3, 6, 7,
-		// Top face
-		1, 5, 6,
-		1, 6, 2,
-		// Bottom face
-		4, 0, 3,
-		4, 3, 7
-	};
+	VInitData.pSysMem = Vertices.data();
+	HR(mD3DDevice->CreateBuffer( &VBD, &VInitData, &mLandscapeVB ) );
 
 	D3D11_BUFFER_DESC IBD;
 	IBD.Usage = D3D11_USAGE_IMMUTABLE;
-	IBD.ByteWidth = 36 * sizeof(UINT);
+	IBD.ByteWidth = (UINT)LandscapeMesh.Indices.size() * sizeof(UINT);
 	IBD.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	IBD.CPUAccessFlags = 0;
 	IBD.MiscFlags = 0;
 	IBD.StructureByteStride = 0;
 	D3D11_SUBRESOURCE_DATA IInitData;
-	IInitData.pSysMem = Indices;
+	IInitData.pSysMem = LandscapeMesh.Indices.data();
+
+	mNumIndices = (UINT)LandscapeMesh.Indices.size();
 	
-	HR( mD3DDevice->CreateBuffer( &IBD, &IInitData, &mBoxIB ) );
+	HR( mD3DDevice->CreateBuffer( &IBD, &IInitData, &mLandscapeIB ) );
 }
 
 void Example3App::BuildShaders()
@@ -270,7 +280,7 @@ void Example3App::BuildVertexLayout()
 	D3D11_INPUT_ELEMENT_DESC VertexDesc[] =
 	{
 		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0, },
-		{ "COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "COLOR",		0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	// Create the input layout
@@ -278,7 +288,7 @@ void Example3App::BuildVertexLayout()
 		mVertexShaderBytecode, mVertexShaderBytecodeSize,
 		&mInputLayout ) );
 
-	// @todo: Make material system where the shader blobs stick around untill everything is initialized
+	// @todo: Make material system where the shader blobs stick around until everything is initialized
 	delete[] mVertexShaderBytecode;
 	mVertexShaderBytecodeSize = -1;
 }
@@ -287,22 +297,22 @@ void Example3App::OnMouseMove( WPARAM BtnState, int x, int y )
 {
 	if( (BtnState & MK_LBUTTON) != 0 )
 	{
-		float DX = DirectX::XMConvertToRadians( 0.25f * static_cast<float>( x - mLastMousePos.x ) );
-		float DY = DirectX::XMConvertToRadians( 0.25f * static_cast<float>( y - mLastMousePos.y ) );
+		float DX = XMConvertToRadians( 0.25f * static_cast<float>( x - mLastMousePos.x ) );
+		float DY = XMConvertToRadians( 0.25f * static_cast<float>( y - mLastMousePos.y ) );
 
 		mTheta += DX;
 		mPhi += DY;
 
-		mPhi = Clamp( mPhi, 0.1f, (float)M_PI - 0.1f );
+		mPhi = Math::Clamp( mPhi, 0.1f, (float)Math::Pi - 0.1f );
 	}
 	else if( (BtnState & MK_RBUTTON) != 0 )
 	{
-		float DX = 0.005f * static_cast<float>(x - mLastMousePos.x );
-		float DY = 0.005f * static_cast<float>(y - mLastMousePos.y );
+		float DX = 0.05f * static_cast<float>(x - mLastMousePos.x );
+		float DY = 0.05f * static_cast<float>(y - mLastMousePos.y );
 
 		mRadius += DX - DY;
 
-		mRadius = Clamp( mRadius, 3.0f, 15.0f );
+		mRadius = Math::Clamp( mRadius, 3.0f, 90.0f );
 	}
 
 	mLastMousePos.x = x;

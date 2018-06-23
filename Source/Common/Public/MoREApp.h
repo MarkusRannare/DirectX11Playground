@@ -14,6 +14,7 @@ class MoREApp
 {
 public:
 	MoREApp( HINSTANCE hInstance );
+	virtual ~MoREApp();
 
 	virtual bool Init();
 
@@ -39,6 +40,8 @@ protected:
 	void CalculateFrameStats();
 
 	void EnumerateAdapters();
+
+	void ReportLiveObjects();
 
 	// Window message callback
 	LRESULT CALLBACK MsgProc( HWND Hwnd, UINT Msg, WPARAM WParam, LPARAM LParam );

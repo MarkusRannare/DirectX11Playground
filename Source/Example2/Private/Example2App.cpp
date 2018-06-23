@@ -4,10 +4,12 @@
 #include "MoMath.h"
 #include "MoFile.h"
 
+using namespace MoRE;
+
 Example2App::Example2App( HINSTANCE hInstance ) :
 	MoREApp( hInstance ),
-	mPhi( 0.25f * (float)M_PI ),
-	mTheta( 1.5f * (float)M_PI ),
+	mPhi( 0.25f * (float)Math::Pi ),
+	mTheta( 1.5f * (float)Math::Pi ),
 	mRadius( 7.0f ),
 	mRasterState( nullptr ),
 	mVertexShader( nullptr ),
@@ -28,6 +30,8 @@ Example2App::Example2App( HINSTANCE hInstance ) :
 
 Example2App::~Example2App()
 {
+	ReleaseCOM(mPixelShader);
+	ReleaseCOM(mDepthStencilState);
 	ReleaseCOM(mConstantBuffer);
 	ReleaseCOM(mRasterState);
 	ReleaseCOM(mInputLayout);
@@ -101,10 +105,9 @@ void Example2App::OnResize()
 {
 	MoREApp::OnResize();
 
-	// @todo: Make a portable version of M_PI
 	// @todo: Make NearZ and FarZ config variables
 	DirectX::XMMATRIX Proj = DirectX::XMMatrixPerspectiveFovLH( 
-		0.25f * (float)M_PI,
+		0.25f * (float)Math::Pi,
 		AspectRatio(),
 		1.0f, // NearZ
 		1000.0f ); // FarZ
@@ -177,18 +180,18 @@ void Example2App::UpdateScene( double DeltaTime )
 
 void Example2App::BuildGeometryBuffers()
 {
-	// @todo: Do something more gracius about this. Althrough gives the correct result, we have the data in the wrong component in the XMCOLOR
 	// Create vertex buffer
+	// @todo: Do something more gracious about ArgbToAbgr. Al through gives the correct result, we have the data in the wrong component in the XMCOLOR
 	Vertex Vertices[] =
 	{
-		{ DirectX::XMFLOAT3( -1.0f, -1.0f, -1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::White ) )		},
-		{ DirectX::XMFLOAT3( -1.0f, +1.0f, -1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Black ) )		},
-		{ DirectX::XMFLOAT3( +1.0f, +1.0f, -1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Red ) )		},
-		{ DirectX::XMFLOAT3( +1.0f, -1.0f, -1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Green ) )		},
-		{ DirectX::XMFLOAT3( -1.0f, -1.0f, +1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Blue ) )		},
-		{ DirectX::XMFLOAT3( -1.0f, +1.0f, +1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Yellow ) )		},
-		{ DirectX::XMFLOAT3( +1.0f, +1.0f, +1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Cyan ) )		},
-		{ DirectX::XMFLOAT3( +1.0f, -1.0f, +1.0f ), MoRE::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Magenta ) )	}
+		{ DirectX::XMFLOAT3( -1.0f, -1.0f, -1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::White ) )		},
+		{ DirectX::XMFLOAT3( -1.0f, +1.0f, -1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Black ) )		},
+		{ DirectX::XMFLOAT3( +1.0f, +1.0f, -1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Red ) )		},
+		{ DirectX::XMFLOAT3( +1.0f, -1.0f, -1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Green ) )		},
+		{ DirectX::XMFLOAT3( -1.0f, -1.0f, +1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Blue ) )		},
+		{ DirectX::XMFLOAT3( -1.0f, +1.0f, +1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Yellow ) )		},
+		{ DirectX::XMFLOAT3( +1.0f, +1.0f, +1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Cyan ) )		},
+		{ DirectX::XMFLOAT3( +1.0f, -1.0f, +1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Magenta ) )	}
 	};
 
 	D3D11_BUFFER_DESC VBD;
@@ -272,7 +275,7 @@ void Example2App::BuildVertexLayout()
 		mVertexShaderBytecode, mVertexShaderBytecodeSize,
 		&mInputLayout ) );
 
-	// @todo: Make material system where the shader blobs stick around untill everything is initialized
+	// @todo: Make material system where the shader blobs stick around until everything is initialized
 	delete[] mVertexShaderBytecode;
 	mVertexShaderBytecodeSize = -1;
 }
@@ -287,7 +290,7 @@ void Example2App::OnMouseMove( WPARAM BtnState, int x, int y )
 		mTheta += DX;
 		mPhi += DY;
 
-		mPhi = MoRE::Clamp( mPhi, 0.1f, (float)M_PI - 0.1f );
+		mPhi = Math::Clamp( mPhi, 0.1f, (float)Math::Pi - 0.1f );
 	}
 	else if( (BtnState & MK_RBUTTON) != 0 )
 	{
@@ -296,7 +299,7 @@ void Example2App::OnMouseMove( WPARAM BtnState, int x, int y )
 
 		mRadius += DX - DY;
 
-		mRadius = MoRE::Clamp( mRadius, 3.0f, 15.0f );
+		mRadius = Math::Clamp( mRadius, 3.0f, 15.0f );
 	}
 
 	mLastMousePos.x = x;

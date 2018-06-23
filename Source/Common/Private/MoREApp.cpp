@@ -162,6 +162,18 @@ MoREApp::MoREApp( HINSTANCE hInstance ) :
 	fmoREApp = this;
 }
 
+MoREApp::~MoREApp()
+{
+	ReleaseCOM(mD3DImmediateContext);
+	ReleaseCOM(mSwapChain);
+	ReleaseCOM(mDepthStencilBuffer);
+	ReleaseCOM(mRenderTargetView);
+	ReleaseCOM(mDepthStencilView);
+	// Uncomment the following line to make it easier to find leaking resources
+	//ReportLiveObjects();
+	ReleaseCOM(mD3DDevice);
+}
+
 bool MoREApp::InitWindow()
 {
 	WNDCLASS WC;
@@ -547,4 +559,15 @@ int MoREApp::Run()
 float MoREApp::AspectRatio() const
 {
 	return mClientWidth / (float)mClientHeight;
+}
+
+void MoREApp::ReportLiveObjects()
+{
+#ifdef _DEBUG
+	ID3D11Debug* DebugDevice = nullptr;
+	HR(mD3DDevice->QueryInterface(__uuidof(ID3D11Debug), (void**)(&DebugDevice)));
+	HR(DebugDevice->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL));
+	
+	ReleaseCOM(DebugDevice);
+#endif
 }

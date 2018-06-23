@@ -19,7 +19,7 @@ class Example2App : public MoREApp
 {
 public:
 	Example2App( HINSTANCE hInstance );
-	~Example2App();
+	virtual ~Example2App();
 
 	virtual bool Init() override;
 
