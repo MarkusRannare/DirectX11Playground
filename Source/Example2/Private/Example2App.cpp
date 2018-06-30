@@ -5,6 +5,7 @@
 #include "MoFile.h"
 
 using namespace MoRE;
+using namespace DirectX;
 
 Example2App::Example2App( HINSTANCE hInstance ) :
 	MoREApp( hInstance ),
@@ -22,10 +23,10 @@ Example2App::Example2App( HINSTANCE hInstance ) :
 	mLastMousePos.x = 0;
 	mLastMousePos.y = 0;
 
-	DirectX::XMMATRIX Ident = DirectX::XMMatrixIdentity();
-	DirectX::XMStoreFloat4x4( &mWorld, Ident );
-	DirectX::XMStoreFloat4x4( &mView, Ident );
-	DirectX::XMStoreFloat4x4( &mProj, Ident );
+	XMMATRIX Ident = XMMatrixIdentity();
+	XMStoreFloat4x4( &mWorld, Ident );
+	XMStoreFloat4x4( &mView, Ident );
+	XMStoreFloat4x4( &mProj, Ident );
 }
 
 Example2App::~Example2App()
@@ -106,7 +107,7 @@ void Example2App::OnResize()
 	MoREApp::OnResize();
 
 	// @todo: Make NearZ and FarZ config variables
-	DirectX::XMMATRIX Proj = DirectX::XMMatrixPerspectiveFovLH( 
+	XMMATRIX Proj = XMMatrixPerspectiveFovLH( 
 		0.25f * (float)Math::Pi,
 		AspectRatio(),
 		1.0f, // NearZ
@@ -132,16 +133,16 @@ void Example2App::DrawScene()
 	mD3DImmediateContext->IASetVertexBuffers( 0, 1, &mBoxVB, &Stride, &Offset );
 	mD3DImmediateContext->IASetIndexBuffer( mBoxIB, DXGI_FORMAT_R16_UINT, 0 );
 
-	DirectX::XMMATRIX World = DirectX::XMLoadFloat4x4( &mWorld );
-	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4( &mView );
-	DirectX::XMMATRIX Proj = DirectX::XMLoadFloat4x4( &mProj );
-	DirectX::XMMATRIX WorldViewProj = World * View * Proj;
+	XMMATRIX World = XMLoadFloat4x4( &mWorld );
+	XMMATRIX View = XMLoadFloat4x4( &mView );
+	XMMATRIX Proj = XMLoadFloat4x4( &mProj );
+	XMMATRIX WorldViewProj = World * View * Proj;
 
 	// Need to transpose matrices, as we want them packed Column major, while CPU size, they are Row major
-	WorldViewProj = DirectX::XMMatrixTranspose(WorldViewProj);
+	WorldViewProj = XMMatrixTranspose(WorldViewProj);
 
 	VS_ConstantBuffer ConstantBuffer;
-	DirectX::XMStoreFloat4x4(&ConstantBuffer.WorldViewProj, WorldViewProj);
+	XMStoreFloat4x4(&ConstantBuffer.WorldViewProj, WorldViewProj);
 
 	// Update the constant buffer
 	D3D11_MAPPED_SUBRESOURCE Content;
@@ -170,12 +171,12 @@ void Example2App::UpdateScene( double DeltaTime )
 	float y = mRadius * cosf( mPhi );
 
 	// Build view matrix
-	DirectX::XMVECTOR Pos = DirectX::XMVectorSet( x, y, z, 1.0f );
-	DirectX::XMVECTOR Target = DirectX::XMVectorZero();
-	DirectX::XMVECTOR Up = DirectX::XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
+	XMVECTOR Pos = XMVectorSet( x, y, z, 1.0f );
+	XMVECTOR Target = XMVectorZero();
+	XMVECTOR Up = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
 
-	DirectX::XMMATRIX View = DirectX::XMMatrixLookAtLH( Pos, Target, Up );
-	DirectX::XMStoreFloat4x4( &mView, View );
+	XMMATRIX View = XMMatrixLookAtLH( Pos, Target, Up );
+	XMStoreFloat4x4( &mView, View );
 }
 
 void Example2App::BuildGeometryBuffers()
@@ -184,14 +185,14 @@ void Example2App::BuildGeometryBuffers()
 	// @todo: Do something more gracious about ArgbToAbgr. Al through gives the correct result, we have the data in the wrong component in the XMCOLOR
 	Vertex Vertices[] =
 	{
-		{ DirectX::XMFLOAT3( -1.0f, -1.0f, -1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::White ) )		},
-		{ DirectX::XMFLOAT3( -1.0f, +1.0f, -1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Black ) )		},
-		{ DirectX::XMFLOAT3( +1.0f, +1.0f, -1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Red ) )		},
-		{ DirectX::XMFLOAT3( +1.0f, -1.0f, -1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Green ) )		},
-		{ DirectX::XMFLOAT3( -1.0f, -1.0f, +1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Blue ) )		},
-		{ DirectX::XMFLOAT3( -1.0f, +1.0f, +1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Yellow ) )		},
-		{ DirectX::XMFLOAT3( +1.0f, +1.0f, +1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Cyan ) )		},
-		{ DirectX::XMFLOAT3( +1.0f, -1.0f, +1.0f ), Math::ArgbToAbgr( DirectX::PackedVector::XMCOLOR( (const float*)&Colors::Magenta ) )	}
+		{ XMFLOAT3( -1.0f, -1.0f, -1.0f ), Math::ArgbToAbgr( PackedVector::XMCOLOR( (const float*)&Colors::White ) )		},
+		{ XMFLOAT3( -1.0f, +1.0f, -1.0f ), Math::ArgbToAbgr( PackedVector::XMCOLOR( (const float*)&Colors::Black ) )		},
+		{ XMFLOAT3( +1.0f, +1.0f, -1.0f ), Math::ArgbToAbgr( PackedVector::XMCOLOR( (const float*)&Colors::Red ) )		},
+		{ XMFLOAT3( +1.0f, -1.0f, -1.0f ), Math::ArgbToAbgr( PackedVector::XMCOLOR( (const float*)&Colors::Green ) )		},
+		{ XMFLOAT3( -1.0f, -1.0f, +1.0f ), Math::ArgbToAbgr( PackedVector::XMCOLOR( (const float*)&Colors::Blue ) )		},
+		{ XMFLOAT3( -1.0f, +1.0f, +1.0f ), Math::ArgbToAbgr( PackedVector::XMCOLOR( (const float*)&Colors::Yellow ) )		},
+		{ XMFLOAT3( +1.0f, +1.0f, +1.0f ), Math::ArgbToAbgr( PackedVector::XMCOLOR( (const float*)&Colors::Cyan ) )		},
+		{ XMFLOAT3( +1.0f, -1.0f, +1.0f ), Math::ArgbToAbgr( PackedVector::XMCOLOR( (const float*)&Colors::Magenta ) )	}
 	};
 
 	D3D11_BUFFER_DESC VBD;
@@ -284,8 +285,8 @@ void Example2App::OnMouseMove( WPARAM BtnState, int x, int y )
 {
 	if( (BtnState & MK_LBUTTON) != 0 )
 	{
-		float DX = DirectX::XMConvertToRadians( 0.25f * static_cast<float>( x - mLastMousePos.x ) );
-		float DY = DirectX::XMConvertToRadians( 0.25f * static_cast<float>( y - mLastMousePos.y ) );
+		float DX = XMConvertToRadians( 0.25f * static_cast<float>( x - mLastMousePos.x ) );
+		float DY = XMConvertToRadians( 0.25f * static_cast<float>( y - mLastMousePos.y ) );
 
 		mTheta += DX;
 		mPhi += DY;

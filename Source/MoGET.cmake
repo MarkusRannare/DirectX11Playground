@@ -26,10 +26,6 @@ function( BeginModule ModuleName ModuleType )
 	else()
 		message( FATAL_ERROR "Could not find ModuleType '${ModuleType}', valid values are LIBRARY and EXECUTABLE")
 	endif()
-
-	# this needs to be setup after add_executable/
-	
-
 endfunction( BeginModule )
 
 function( EndModule )
@@ -69,7 +65,6 @@ function( AppendShaderFiles SourceDirectory DestinationVariable )
 	endforeach()
 endfunction( AppendShaderFiles )
 
-# @todonow: Pass in the name of the variable we want to append source files to
 # Will set the variable SourceList with all the source files to build
 function( GatherSourceFiles SourceDirectory SourceList )
 	# @todo: Add sources from additional directories from cache variables
@@ -95,7 +90,6 @@ function( SetupIDEFilters FileList )
 endfunction( SetupIDEFilters )
 
 function( SetOutputPaths )
-
 	# This doesn't work... IntermediatePath isn't config in cmake
 	# set( IntermediatePath "../../Intermediate/$(LibraryName)/Win32/$(Config)/" )
 	set( BinariesPath "${CMAKE_SOURCE_DIR}../../Binaries/${MOGET_PLATFORM}/" )
@@ -114,7 +108,6 @@ function( SetOutputPaths )
 			OUTPUT_NAME_${UpperConfig} ${MOGET_CURRENT_MODULE}-${Config}
 		)
     endforeach ()
-
 endfunction( SetOutputPaths )
 
 function( DependsOn ModuleName )

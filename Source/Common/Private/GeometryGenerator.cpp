@@ -1,5 +1,7 @@
 #include "GeometryGenerator.h"
 
+using namespace DirectX;
+
 namespace MoRE
 {
 	namespace GeometryGenerator
@@ -29,10 +31,10 @@ namespace MoRE
 
 					Vertex& Vert = Out_Mesh.Vertices[IdxZ * VertsX + IdxX];
 
-					Vert.Position = DirectX::XMFLOAT3( X, 0.0f, Z );
-					Vert.Normal = DirectX::XMFLOAT3( 0.0f, 1.0f, 0.0f );
-					Vert.Tangent = DirectX::XMFLOAT3( 1.0f, 0.0f, 0.0f );
-					Vert.Tex = DirectX::XMFLOAT2( IdxX * DU, IdxZ * DV );
+					Vert.Position = XMFLOAT3( X, 0.0f, Z );
+					Vert.Normal = XMFLOAT3( 0.0f, 1.0f, 0.0f );
+					Vert.Tangent = XMFLOAT3( 1.0f, 0.0f, 0.0f );
+					Vert.Tex = XMFLOAT2( IdxX * DU, IdxZ * DV );
 				}
 			}
 

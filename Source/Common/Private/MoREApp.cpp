@@ -5,6 +5,8 @@
 #include <sstream>
 #include <DirectXMath.h>
 
+using namespace DirectX;
+
 static MoREApp* fmoREApp = nullptr;
 static std::wstring fWndClassName( TEXT("MoREWndClassName") );
 
@@ -452,7 +454,7 @@ void MoREApp::OnResize()
 
 bool MoREApp::Init()
 {
-	if( !DirectX::XMVerifyCPUSupport() )
+	if( !XMVerifyCPUSupport() )
 	{
 		MessageBox( 0, TEXT( "MoRE requires SSE2 support to properly function" ), 0, 0 );
 		return false;

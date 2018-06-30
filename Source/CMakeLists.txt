@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.12)
 # Molly Game Engine Toolset
 project (MoGET)
 
-if( ${CMAKE_VS_PLATFORM_NAME} MATCHES WIN32 )
+if( ${CMAKE_VS_PLATFORM_NAME} MATCHES Win32 )
 	set( MOGET_PLATFORM "Win32" CACHE STRING "The current platform, platform independent" FORCE )
 elseif( ${CMAKE_VS_PLATFORM_NAME} MATCHES x64 )
 	set( MOGET_PLATFORM "Win64" CACHE STRING "The current platform, platform independent" FORCE )

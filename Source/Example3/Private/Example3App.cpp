@@ -24,10 +24,10 @@ Example3App::Example3App( HINSTANCE hInstance ) :
 	mLastMousePos.x = 0;
 	mLastMousePos.y = 0;
 
-	DirectX::XMMATRIX Ident = DirectX::XMMatrixIdentity();
-	DirectX::XMStoreFloat4x4( &mWorld, Ident );
-	DirectX::XMStoreFloat4x4( &mView, Ident );
-	DirectX::XMStoreFloat4x4( &mProj, Ident );
+	XMMATRIX Ident = XMMatrixIdentity();
+	XMStoreFloat4x4( &mWorld, Ident );
+	XMStoreFloat4x4( &mView, Ident );
+	XMStoreFloat4x4( &mProj, Ident );
 }
 
 Example3App::~Example3App()
@@ -109,7 +109,7 @@ void Example3App::OnResize()
 	MoREApp::OnResize();
 
 	// @todo: Make NearZ and FarZ config variables
-	DirectX::XMMATRIX Proj = DirectX::XMMatrixPerspectiveFovLH( 
+	XMMATRIX Proj = XMMatrixPerspectiveFovLH( 
 		0.25f * (float)Math::Pi,
 		AspectRatio(),
 		1.0f, // NearZ
@@ -135,16 +135,16 @@ void Example3App::DrawScene()
 	mD3DImmediateContext->IASetVertexBuffers( 0, 1, &mLandscapeVB, &Stride, &Offset );
 	mD3DImmediateContext->IASetIndexBuffer( mLandscapeIB, DXGI_FORMAT_R32_UINT, 0 );
 
-	DirectX::XMMATRIX World = DirectX::XMLoadFloat4x4( &mWorld );
-	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4( &mView );
-	DirectX::XMMATRIX Proj = DirectX::XMLoadFloat4x4( &mProj );
-	DirectX::XMMATRIX WorldViewProj = World * View * Proj;
+	XMMATRIX World = XMLoadFloat4x4( &mWorld );
+	XMMATRIX View = XMLoadFloat4x4( &mView );
+	XMMATRIX Proj = XMLoadFloat4x4( &mProj );
+	XMMATRIX WorldViewProj = World * View * Proj;
 
 	// Need to transpose matrices, as we want them packed Column major, while CPU size, they are Row major
-	WorldViewProj = DirectX::XMMatrixTranspose(WorldViewProj);
+	WorldViewProj = XMMatrixTranspose(WorldViewProj);
 
 	VS_ConstantBuffer ConstantBuffer;
-	DirectX::XMStoreFloat4x4(&ConstantBuffer.WorldViewProj, WorldViewProj);
+	XMStoreFloat4x4(&ConstantBuffer.WorldViewProj, WorldViewProj);
 
 	// Update the constant buffer
 	D3D11_MAPPED_SUBRESOURCE Content;
@@ -173,12 +173,12 @@ void Example3App::UpdateScene( double DeltaTime )
 	float y = mRadius * cosf( mPhi );
 
 	// Build view matrix
-	DirectX::XMVECTOR Pos = DirectX::XMVectorSet( x, y, z, 1.0f );
-	DirectX::XMVECTOR Target = DirectX::XMVectorZero();
-	DirectX::XMVECTOR Up = DirectX::XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
+	XMVECTOR Pos = XMVectorSet( x, y, z, 1.0f );
+	XMVECTOR Target = XMVectorZero();
+	XMVECTOR Up = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
 
-	DirectX::XMMATRIX View = DirectX::XMMatrixLookAtLH( Pos, Target, Up );
-	DirectX::XMStoreFloat4x4( &mView, View );
+	XMMATRIX View = XMMatrixLookAtLH( Pos, Target, Up );
+	XMStoreFloat4x4( &mView, View );
 }
 
 float Example3App::GetHeight( float X, float Z ) const
