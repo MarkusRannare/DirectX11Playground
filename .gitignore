@@ -39,6 +39,13 @@
 *.VC.VC.opendb
 */.vs/*
 *.vcxproj.user
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+
+# Ignore links as we genereate links to project files
+*.lnk
 
 # Intermediate files
 *.ilk

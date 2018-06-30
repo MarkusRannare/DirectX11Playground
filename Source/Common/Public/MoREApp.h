@@ -13,28 +13,28 @@
 class MoREApp
 {
 public:
-	MoREApp( HINSTANCE hInstance );
-	virtual ~MoREApp();
+	COMMON_API MoREApp( HINSTANCE hInstance );
+	COMMON_API virtual ~MoREApp();
 
-	virtual bool Init();
+	COMMON_API virtual bool Init();
 
 	// Get the aspect ratio of the window
-	float AspectRatio() const;
+	COMMON_API float AspectRatio() const;
 
-	int Run();
+	COMMON_API int Run();
 protected:
 	MoREApp() = delete; // Don't allow creating apps this way
 		
 	bool InitWindow();
 	bool InitDirect3D();
 
-	virtual void OnResize();
-	virtual void UpdateScene( double DeltaTime );
-	virtual void DrawScene();
+	COMMON_API virtual void OnResize();
+	COMMON_API virtual void UpdateScene( double DeltaTime );
+	COMMON_API virtual void DrawScene();
 
-	virtual void OnMouseDown( WPARAM BtnState, int x, int y ) {}
-	virtual void OnMouseUp( WPARAM BtnState, int x, int y ) {}
-	virtual void OnMouseMove( WPARAM BtnState, int x, int y ) {}
+	COMMON_API virtual void OnMouseDown( WPARAM BtnState, int x, int y ) {}
+	COMMON_API virtual void OnMouseUp( WPARAM BtnState, int x, int y ) {}
+	COMMON_API virtual void OnMouseMove( WPARAM BtnState, int x, int y ) {}
 
 	void ProcessMessageQueue();
 	void CalculateFrameStats();

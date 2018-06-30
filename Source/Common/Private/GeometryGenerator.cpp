@@ -56,5 +56,17 @@ namespace MoRE
 				}
 			}
 		}
+
+		size_t MeshData::GetVertices( Vertex*& Out_Vertices )
+		{
+			Out_Vertices = Vertices.data();
+			return Vertices.size();
+		}
+
+		size_t MeshData::GetIndices( UINT*& Out_Indices )
+		{
+			Out_Indices = Indices.data();
+			return Indices.size();
+		}
 	}
 }

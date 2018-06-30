@@ -1,8 +1,9 @@
 ﻿#pragma once
 
-// Get including projects to include our library
-#pragma comment(lib,"Common.lib")
+#include "Build.h"
 
-// Dependencies
-#pragma comment(lib,"d3d11.lib") 
-#pragma comment(lib,"dxgi.lib") 
+#ifdef COMMON_EXPORTS
+	#define COMMON_API DLL_EXPORT
+#else
+	#define COMMON_API DLL_IMPORT
+#endif

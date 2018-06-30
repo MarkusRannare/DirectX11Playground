@@ -25,6 +25,7 @@
 #define NOMINMAX
 #endif
 
+#include "Common.h"
 #include "Platform.h"
 #include <sal.h>
 
@@ -62,7 +63,7 @@ void WINAPI DXGetErrorDescriptionW( _In_ HRESULT hr, _Out_cap_(count) WCHAR* des
 //
 //  Return: The hr that was passed in.  
 //--------------------------------------------------------------------------------------
-HRESULT WINAPI DXTraceW( _In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hr, _In_opt_ const WCHAR* strMsg, _In_ bool bPopMsgBox );
+COMMON_API HRESULT WINAPI DXTraceW( _In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hr, _In_opt_ const WCHAR* strMsg, _In_ bool bPopMsgBox );
 
 #define DXTrace DXTraceW
 

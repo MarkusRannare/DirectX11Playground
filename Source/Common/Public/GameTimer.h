@@ -8,9 +8,10 @@
 #ifndef GAMETIMER_H
 #define GAMETIMER_H
 
+#include "Common.h"
 #include "Types.h"
 
-class GameTimer
+class COMMON_API GameTimer
 {
 public:
 	GameTimer();

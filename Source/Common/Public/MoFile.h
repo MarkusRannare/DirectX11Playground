@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Common.h"
+
 namespace MoRE
 {
-	bool ReadFileContent(const char* Filename, const char* ReadMode, char** out_FileContent, long& out_ContentSize);
+	COMMON_API bool ReadFileContent(const char* Filename, const char* ReadMode, char** out_FileContent, long& out_ContentSize);
 }
