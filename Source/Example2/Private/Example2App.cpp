@@ -272,7 +272,7 @@ void Example2App::BuildVertexLayout()
 	};
 
 	// Create the input layout
-	HR( mD3DDevice->CreateInputLayout( VertexDesc, 2,
+	HR( mD3DDevice->CreateInputLayout( VertexDesc, sizeof(VertexDesc) / sizeof(D3D11_INPUT_ELEMENT_DESC),
 		mVertexShaderBytecode, mVertexShaderBytecodeSize,
 		&mInputLayout ) );
 

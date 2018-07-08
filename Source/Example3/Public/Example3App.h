@@ -8,6 +8,7 @@ struct Vertex
 {
 	DirectX::XMFLOAT3 Pos;
 	DirectX::PackedVector::XMCOLOR Color;
+	DirectX::XMFLOAT3 Normal;
 };
 
 struct VS_ConstantBuffer
@@ -31,10 +32,11 @@ public:
 	virtual void OnMouseDown( WPARAM BtnState, int x, int y ) override;
 protected:
 	float GetHeight( float X, float Z ) const;
+	DirectX::XMFLOAT3 GetNormal( float X, float Z ) const;
 
 	virtual void OnResize() override;
 
-	void CreateConstantBuffer();
+	void CreateConstantBuffers();
 	void BuildGeometryBuffers();
 	void BuildShaders();
 	void BuildVertexLayout();
@@ -50,11 +52,13 @@ private:
 	float mPhi;
 	float mTheta;
 	float mRadius;
+	DirectX::XMFLOAT3 mCameraLocation;
 
 	// Landscape variables
 	struct ID3D11Buffer* mLandscapeVB;
 	struct ID3D11Buffer* mLandscapeIB;
 	struct ID3D11Buffer* mConstantBuffer;
+	struct ID3D11Buffer* mLightingBuffer;
 	UINT mNumIndices;
 
 	// Shader variables

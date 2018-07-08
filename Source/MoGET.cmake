@@ -7,7 +7,7 @@ endfunction( AddDefaultIncludes )
 function( BeginModule ModuleName ModuleType )
 	# @todo: Verify that no other project exists already
 	set( MOGET_CURRENT_MODULE ${ModuleName} CACHE STRING "Name of current module" FORCE )
-	set( MOGET_CURRENT_CONTENT_PATH "${CMAKE_SOURCE_DIR}../${ModuleName}" CACHE STRING "Path where we put content to current project" FORCE )
+	set( MOGET_CURRENT_CONTENT_PATH "${CMAKE_SOURCE_DIR}/../${ModuleName}" CACHE STRING "Path where we put content to current project" FORCE )
 	string( TOUPPER ${ModuleName} UpperModule )
 	add_definitions(-D${UpperModule}_EXPORTS )
 	AddDefaultIncludes()

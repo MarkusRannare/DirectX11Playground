@@ -4,6 +4,7 @@
 #include "MoMath.h"
 #include "MoFile.h"
 #include "GeometryGenerator.h"
+#include "ShaderTypes/LightingData.h"
 
 using namespace MoRE;
 using namespace DirectX;
@@ -12,7 +13,7 @@ Example3App::Example3App( HINSTANCE hInstance ) :
 	MoREApp( hInstance ),
 	mPhi( 0.45f * (float)Math::Pi ),
 	mTheta( 1.5f * (float)Math::Pi ),
-	mRadius( 75.0f ),
+	mRadius( 85.0f ),
 	mRasterState( nullptr ),
 	mVertexShader( nullptr ),
 	mPixelShader( nullptr ),
@@ -36,6 +37,7 @@ Example3App::~Example3App()
 	ReleaseCOM(mPixelShader);
 	ReleaseCOM(mDepthStencilState);
 	ReleaseCOM(mConstantBuffer);
+	ReleaseCOM(mLightingBuffer);
 	ReleaseCOM(mRasterState);
 	ReleaseCOM(mInputLayout);
 	ReleaseCOM(mVertexShader);
@@ -53,7 +55,7 @@ bool Example3App::Init()
 	BuildGeometryBuffers();
 	BuildShaders();
 	BuildVertexLayout();
-	CreateConstantBuffer();
+	CreateConstantBuffers();
 
 	// @todo: Create a default raster state
 	// Setup raster state
@@ -90,7 +92,7 @@ bool Example3App::Init()
 	return true;
 }
 
-void Example3App::CreateConstantBuffer()
+void Example3App::CreateConstantBuffers()
 {	
 	// Setup constant buffer
 	D3D11_BUFFER_DESC CBDesc;
@@ -102,6 +104,17 @@ void Example3App::CreateConstantBuffer()
 	CBDesc.StructureByteStride = 0;
 
 	HR( mD3DDevice->CreateBuffer( &CBDesc, nullptr, &mConstantBuffer ) );
+
+	// Setup lighting buffer
+	D3D11_BUFFER_DESC CBLightingDesc;
+	CBLightingDesc.ByteWidth = sizeof(ShaderLighting);
+	CBLightingDesc.Usage = D3D11_USAGE_DYNAMIC;
+	CBLightingDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	CBLightingDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	CBLightingDesc.MiscFlags = 0;
+	CBLightingDesc.StructureByteStride = 0;
+
+	HR(mD3DDevice->CreateBuffer(&CBLightingDesc, nullptr, &mLightingBuffer));
 }
 
 void Example3App::OnResize()
@@ -146,6 +159,28 @@ void Example3App::DrawScene()
 	VS_ConstantBuffer ConstantBuffer;
 	XMStoreFloat4x4(&ConstantBuffer.WorldViewProj, WorldViewProj);
 
+	// Update lighting constant buffer
+	ShaderLighting Lighting;
+	Lighting.AmbientLightColor = XMFLOAT3( 0.05f, 0.05f, 0.05f );
+	Lighting.NumDirectionalLights = 2;
+	Lighting.EyeLocaiton = mCameraLocation;
+	XMVECTOR Direction = XMVector3Normalize( XMVectorSet( 0.5f, 0.5f, 0.5f, 0.0f ) );
+	XMStoreFloat3(&Lighting.DirectionalLights[0].Direction, Direction );
+
+	Lighting.DirectionalLights[0].DiffuseColor = XMFLOAT3( 1.0f, 0.8f, 0.8f );
+	Lighting.DirectionalLights[0].SpecularColor = XMFLOAT3( 0.0f, 1.0f, 0.0f );
+
+	Direction = XMVector3Normalize(XMVectorSet(1, 0, 0, 0.0f));
+	XMStoreFloat3(&Lighting.DirectionalLights[1].Direction, Direction);
+
+	Lighting.DirectionalLights[1].DiffuseColor = XMFLOAT3(0.8f, 0.8f, 1.0f);
+	Lighting.DirectionalLights[1].SpecularColor = XMFLOAT3(1.0f, 0.0f, 0.0f);
+
+	D3D11_MAPPED_SUBRESOURCE LightingContent;
+	mD3DImmediateContext->Map(mLightingBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &LightingContent);
+	memcpy(LightingContent.pData, &Lighting, sizeof(ShaderLighting));
+	mD3DImmediateContext->Unmap(mLightingBuffer, 0);
+	
 	// Update the constant buffer
 	D3D11_MAPPED_SUBRESOURCE Content;
 	mD3DImmediateContext->Map( mConstantBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &Content );
@@ -153,6 +188,7 @@ void Example3App::DrawScene()
 	mD3DImmediateContext->Unmap( mConstantBuffer, 0 );
 
 	mD3DImmediateContext->VSSetConstantBuffers( 0, 1, &mConstantBuffer );
+	mD3DImmediateContext->PSSetConstantBuffers( 0, 1, &mLightingBuffer );
 	mD3DImmediateContext->VSSetShader( mVertexShader, nullptr, 0 );
 	mD3DImmediateContext->PSSetShader( mPixelShader, nullptr, 0 );
 
@@ -168,16 +204,18 @@ void Example3App::UpdateScene( double DeltaTime )
 	MoREApp::UpdateScene( DeltaTime );
 
 	// Convert Spherical to Cartesian coordinates
-	float x = mRadius * sinf(mPhi) * cosf(mTheta);
+	float x = mRadius * sinf( mPhi ) * cosf( mTheta );
 	float z = mRadius * sinf( mPhi ) * sinf( mTheta );
 	float y = mRadius * cosf( mPhi );
 
+	// Cache the camera location so we can send it to shaders
+	mCameraLocation = XMFLOAT3( x, y, z );
 	// Build view matrix
 	XMVECTOR Pos = XMVectorSet( x, y, z, 1.0f );
 	XMVECTOR Target = XMVectorZero();
 	XMVECTOR Up = XMVectorSet( 0.0f, 1.0f, 0.0f, 0.0f );
 
-	XMMATRIX View = XMMatrixLookAtLH( Pos, Target, Up );
+	XMMATRIX View = XMMatrixLookAtLH(Pos, Target, Up );
 	XMStoreFloat4x4( &mView, View );
 }
 
@@ -186,18 +224,34 @@ float Example3App::GetHeight( float X, float Z ) const
 	return 0.3f * ( Z * sinf( 0.1f * X ) + X * cosf( 0.1f * Z ) );
 }
 
+DirectX::XMFLOAT3 Example3App::GetNormal( float X, float Z ) const
+{
+	// n = (-df/dx. 1. df/dz)
+	XMFLOAT3 Normal(
+		-0.03f * Z * cosf( 0.1f * X ) - 0.3f * cosf( 0.1f * Z ),
+		1.0f,
+		-0.03f * sinf(0.1f * X ) + 0.03f * X * sinf( 0.1f * Z ) );
+		
+	XMVECTOR UnitNormal = XMVector3Normalize( XMLoadFloat3( &Normal ) );
+	XMStoreFloat3( &Normal, UnitNormal );
+
+	return Normal;
+}
+
 void Example3App::BuildGeometryBuffers()
 {
 	GeometryGenerator::MeshData LandscapeMesh;
 	GeometryGenerator::CreateGrid( 160.0f, 160.0f, 50, 50, LandscapeMesh );
 
 	std::vector<Vertex> Vertices;
+	// @todonow: Investigate why I can access GeometryGenerator::MeshData.Vertices/Indices here, they are not marked for export
 	Vertices.resize( LandscapeMesh.Vertices.size() );
 	for( UINT VerticeIdx = 0; VerticeIdx < LandscapeMesh.Vertices.size(); ++VerticeIdx )
 	{
 		Vertex& Vert = Vertices[VerticeIdx];
 		const XMFLOAT3& Pos = LandscapeMesh.Vertices[VerticeIdx].Position;
 		Vert.Pos = XMFLOAT3( Pos.x, GetHeight( Pos.x, Pos.z ), Pos.z );
+		Vert.Normal = GetNormal(Pos.x, Pos.z);
 	
 		// @todo: Creating colors and sending them to the GPU should be considerable easier
 		if( Vert.Pos.y < -10.0f )
@@ -280,11 +334,12 @@ void Example3App::BuildVertexLayout()
 	D3D11_INPUT_ELEMENT_DESC VertexDesc[] =
 	{
 		{ "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0, },
-		{ "COLOR",		0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		{ "COLOR",		0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	// Create the input layout
-	HR( mD3DDevice->CreateInputLayout( VertexDesc, 2,
+	HR( mD3DDevice->CreateInputLayout( VertexDesc, sizeof(VertexDesc) / sizeof(D3D11_INPUT_ELEMENT_DESC),
 		mVertexShaderBytecode, mVertexShaderBytecodeSize,
 		&mInputLayout ) );
 
@@ -312,7 +367,7 @@ void Example3App::OnMouseMove( WPARAM BtnState, int x, int y )
 
 		mRadius += DX - DY;
 
-		mRadius = Math::Clamp( mRadius, 3.0f, 90.0f );
+		mRadius = Math::Clamp( mRadius, 3.0f, 150.0f );
 	}
 
 	mLastMousePos.x = x;
