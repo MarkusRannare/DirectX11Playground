@@ -4,7 +4,7 @@
 #include <DirectXPackedVector.h>
 
 /**
- * Mirror of HLSL DirectionalLight
+ * Mirror of HLSL DirectionalLight in Lighting.hlsl
  * Added padding to match hlsl vector packing
  */
 struct DirectionalLight

@@ -51,14 +51,21 @@ function( AppendShaderFiles SourceDirectory DestinationVariable )
 		get_filename_component( FileName ${HlslFile} NAME_WE )
 		STRING( FIND ${HlslFile} "Shaders/Pixel/" PixelIndex REVERSE )
 		STRING( FIND ${HlslFile} "Shaders/Vertex/" VertexIndex REVERSE )
+
+		# Some filetypes shouldn't be compiled
+		set( OverrideCompiler "FXCompile" )
+
 		if( PixelIndex STRGREATER -1 )
 			set( ShaderType "Pixel" )
 		elseif( VertexIndex STRGREATER -1 )
 			set( ShaderType "Vertex" )
 		else()
-			message( FATAL_ERROR "Unknown folder for file ${HlslFile}")
+			set( OverrideCompiler "None" )
 		endif()
+
+
 		set_source_files_properties( ${HlslFile} PROPERTIES
+			VS_TOOL_OVERRIDE "${OverrideCompiler}"
 			VS_SHADER_MODEL "4.1"
 			VS_SHADER_TYPE "${ShaderType}"
 			VS_SHADER_OBJECT_FILE_NAME "${MOGET_CURRENT_CONTENT_PATH}/ShaderBinaries/${FileName}.cso" )
