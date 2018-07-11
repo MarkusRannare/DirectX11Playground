@@ -3,7 +3,7 @@
 #include <math.h>
 #include <algorithm>
 
-namespace MoRE
+namespace MoGET
 {
 	namespace Math
 	{

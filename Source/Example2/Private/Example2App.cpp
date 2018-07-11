@@ -4,7 +4,7 @@
 #include "MoMath.h"
 #include "MoFile.h"
 
-using namespace MoRE;
+using namespace MoGET;
 using namespace DirectX;
 
 Example2App::Example2App( HINSTANCE hInstance ) :
@@ -247,14 +247,14 @@ void Example2App::BuildShaders()
 	assert(mD3DDevice);
 
 	assert(mVertexShaderBytecode == nullptr);
-	bool ReadFileResult = MoRE::ReadFileContent( "..\\..\\Example2\\ShaderBinaries\\VertexShader.cso", "rb", &mVertexShaderBytecode, mVertexShaderBytecodeSize );
+	bool ReadFileResult = ReadFileContent( "..\\..\\Example2\\ShaderBinaries\\VertexShader.cso", "rb", &mVertexShaderBytecode, mVertexShaderBytecodeSize );
 	assert(ReadFileResult);
 
 	HR( mD3DDevice->CreateVertexShader( mVertexShaderBytecode, mVertexShaderBytecodeSize, nullptr, &mVertexShader ) );
 
 	long PixelShaderSize = 0;
 	char* PixelShaderBytecode = nullptr;
-	ReadFileResult = MoRE::ReadFileContent( "..\\..\\Example2\\ShaderBinaries\\PixelShader.cso", "rb", &PixelShaderBytecode, PixelShaderSize );
+	ReadFileResult = ReadFileContent( "..\\..\\Example2\\ShaderBinaries\\PixelShader.cso", "rb", &PixelShaderBytecode, PixelShaderSize );
 	assert(ReadFileResult);
 
 	HR( mD3DDevice->CreatePixelShader( PixelShaderBytecode, PixelShaderSize, nullptr, &mPixelShader ) );

@@ -2,13 +2,14 @@
 
 // For XMFLOAT3
 #include "Common.h"
+#include "Array.h"
 #include "DX11Utils.h"
 #include <vector>
 
 struct COMMON_API DirectX::XMFLOAT2;
 struct COMMON_API DirectX::XMFLOAT3;
 
-namespace MoRE
+namespace MoGET
 {
 	namespace GeometryGenerator
 	{
@@ -38,20 +39,8 @@ namespace MoRE
 		// attributes for the vertices and different sizes for the indices
 		struct MeshData
 		{
-			/**
-			 * \param Out_Vertices - the vertices of the mesh
-			 * \return number of vertices
-			 */
-			COMMON_API size_t GetVertices( Vertex*& Out_Vertices );
-			
-			/**
-			 * \param Out_Vertices - the indices of the mesh
-			 * \return number of indices
-			 */
-			COMMON_API size_t GetIndices( UINT*& Out_Indices );
-
-			std::vector<Vertex>	Vertices;
-			std::vector<UINT>	Indices;
+			MoGET::Array<Vertex>	Vertices;
+			MoGET::Array<UINT>		Indices;
 		};
 
 		/**
@@ -60,8 +49,3 @@ namespace MoRE
 		COMMON_API void CreateGrid( float Width, float Depth, UINT VertsX, UINT VertsZ, MeshData& Out_Mesh );
 	}
 }
-
-
-
-//class COMMON_API std::vector<UINT>;
-//class COMMON_API std::vector<MoRE::GeometryGenerator::Vertex>;

@@ -7,17 +7,17 @@
 
 using namespace DirectX;
 
-static MoREApp* fmoREApp = nullptr;
+static MoREApp* fmoGETApp = nullptr;
 static std::wstring fWndClassName( TEXT("MoGETWndClassName") );
 
 // Windows window proc
 static LRESULT CALLBACK MainWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
-	assert( fmoREApp != nullptr );
+	assert( fmoGETApp != nullptr );
 
 	// Forward hwnd on because we can get messages (e.g., WM_CREATE)
 	// before CreateWindow returns, and thus before mhMainWnd is valid.
-	return fmoREApp->MsgProc( hwnd, msg, wParam, lParam );
+	return fmoGETApp->MsgProc( hwnd, msg, wParam, lParam );
 }
 
 LRESULT CALLBACK MoREApp::MsgProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam )
@@ -160,8 +160,8 @@ MoREApp::MoREApp( HINSTANCE hInstance ) :
 	mEnable4xMSAA( false ),
 	mDisableAltEnter( false )
 {
-	assert( fmoREApp == nullptr && "Can only have one MoRE app" );
-	fmoREApp = this;
+	assert( fmoGETApp == nullptr && "Can only have one MoGET app" );
+	fmoGETApp = this;
 }
 
 MoREApp::~MoREApp()
@@ -263,7 +263,7 @@ bool MoREApp::InitDirect3D()
 	// @todo: Store current feature level and disable some effects depending on the feature level or do them differently
 	/*if( featureLevel != D3D_FEATURE_LEVEL_11_0 )
 	{
-		MessageBox( 0, TEXT("Graphics Processessor with DirectX 11 support required for MoRE"), 0, 0 );
+		MessageBox( 0, TEXT("Graphics Processessor with DirectX 11 support required for MoGET"), 0, 0 );
 		return false;
 	}*/
 

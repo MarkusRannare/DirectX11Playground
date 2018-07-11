@@ -2,7 +2,7 @@
 
 using namespace DirectX;
 
-namespace MoRE
+namespace MoGET
 {
 	namespace GeometryGenerator
 	{
@@ -21,7 +21,7 @@ namespace MoRE
 			const float DV = 1.0f / (VertsZ - 1);
 
 			// Generate vertices
-			Out_Mesh.Vertices.resize(VertexCount);
+			Out_Mesh.Vertices.SetNum(VertexCount, false);
 			for( UINT IdxZ = 0; IdxZ < VertsZ; ++IdxZ )
 			{
 				const float Z = HalfDepth - IdxZ * DZ;
@@ -39,8 +39,8 @@ namespace MoRE
 			}
 
 			// Generate indices
-			std::vector<UINT>& Indices = Out_Mesh.Indices;
-			Indices.resize( FaceCount * 3 ); // 3 indices per face
+			Array<UINT>& Indices = Out_Mesh.Indices;
+			Indices.SetNum( FaceCount * 3, false ); // 3 indices per face
 			// Compute indices for each quad
 			UINT Idx = 0;
 			for( UINT IdxZ = 0; IdxZ < VertsZ - 1; ++IdxZ )
@@ -57,18 +57,6 @@ namespace MoRE
 					Idx += 6;
 				}
 			}
-		}
-
-		size_t MeshData::GetVertices( Vertex*& Out_Vertices )
-		{
-			Out_Vertices = Vertices.data();
-			return Vertices.size();
-		}
-
-		size_t MeshData::GetIndices( UINT*& Out_Indices )
-		{
-			Out_Indices = Indices.data();
-			return Indices.size();
 		}
 	}
 }

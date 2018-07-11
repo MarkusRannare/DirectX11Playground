@@ -13,11 +13,11 @@
 
 // This version only supports UNICODE.
 
-// <MoRE>
+// <MoGET>
 // Found at: https://blogs.msdn.microsoft.com/chuckw/2012/04/24/wheres-dxerr-lib/
 // then striped of DirectSound support, as it caused compiler errors
 // @license: AdditionalLicense/DxErr.txt
-// </MoRE>
+// </MoGET>
 
 #pragma once
 

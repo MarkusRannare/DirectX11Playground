@@ -6,7 +6,7 @@
 #include "GeometryGenerator.h"
 #include "ShaderTypes/LightingData.h"
 
-using namespace MoRE;
+using namespace MoGET;
 using namespace DirectX;
 
 Example3App::Example3App( HINSTANCE hInstance ) :
@@ -259,10 +259,9 @@ void Example3App::BuildGeometryBuffers()
 	GeometryGenerator::MeshData LandscapeMesh;
 	GeometryGenerator::CreateGrid( 160.0f, 160.0f, 50, 50, LandscapeMesh );
 
-	std::vector<Vertex> Vertices;
-	// @todonow: Investigate why I can access GeometryGenerator::MeshData.Vertices/Indices here, they are not marked for export
-	Vertices.resize( LandscapeMesh.Vertices.size() );
-	for( UINT VerticeIdx = 0; VerticeIdx < LandscapeMesh.Vertices.size(); ++VerticeIdx )
+	Array<Vertex> Vertices;
+	Vertices.SetNum( LandscapeMesh.Vertices.Length() );
+	for( UINT VerticeIdx = 0; VerticeIdx < LandscapeMesh.Vertices.Length(); ++VerticeIdx )
 	{
 		Vertex& Vert = Vertices[VerticeIdx];
 		const XMFLOAT3& Pos = LandscapeMesh.Vertices[VerticeIdx].Position;
@@ -300,26 +299,26 @@ void Example3App::BuildGeometryBuffers()
 
 	D3D11_BUFFER_DESC VBD;
 	VBD.Usage = D3D11_USAGE_IMMUTABLE;
-	VBD.ByteWidth = sizeof(Vertex) * (UINT)LandscapeMesh.Vertices.size();
+	VBD.ByteWidth = sizeof(Vertex) * (UINT)LandscapeMesh.Vertices.Length();
 	VBD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	VBD.CPUAccessFlags = 0;
 	VBD.MiscFlags = 0;
 	VBD.StructureByteStride = 0;
 	D3D11_SUBRESOURCE_DATA VInitData;
-	VInitData.pSysMem = Vertices.data();
+	VInitData.pSysMem = Vertices.GetRawData();
 	HR(mD3DDevice->CreateBuffer( &VBD, &VInitData, &mLandscapeVB ) );
 
 	D3D11_BUFFER_DESC IBD;
 	IBD.Usage = D3D11_USAGE_IMMUTABLE;
-	IBD.ByteWidth = (UINT)LandscapeMesh.Indices.size() * sizeof(UINT);
+	IBD.ByteWidth = (UINT)LandscapeMesh.Indices.Length() * sizeof(UINT);
 	IBD.BindFlags = D3D11_BIND_INDEX_BUFFER;
 	IBD.CPUAccessFlags = 0;
 	IBD.MiscFlags = 0;
 	IBD.StructureByteStride = 0;
 	D3D11_SUBRESOURCE_DATA IInitData;
-	IInitData.pSysMem = LandscapeMesh.Indices.data();
+	IInitData.pSysMem = LandscapeMesh.Indices.GetRawData();
 
-	mNumIndices = (UINT)LandscapeMesh.Indices.size();
+	mNumIndices = (UINT)LandscapeMesh.Indices.Length();
 	
 	HR( mD3DDevice->CreateBuffer( &IBD, &IInitData, &mLandscapeIB ) );
 }
@@ -329,14 +328,14 @@ void Example3App::BuildShaders()
 	assert(mD3DDevice);
 
 	assert(mVertexShaderBytecode == nullptr);
-	bool ReadFileResult = MoRE::ReadFileContent( "..\\..\\Example3\\ShaderBinaries\\VertexShader.cso", "rb", &mVertexShaderBytecode, mVertexShaderBytecodeSize );
+	bool ReadFileResult = ReadFileContent( "..\\..\\Example3\\ShaderBinaries\\VertexShader.cso", "rb", &mVertexShaderBytecode, mVertexShaderBytecodeSize );
 	assert(ReadFileResult);
 
 	HR( mD3DDevice->CreateVertexShader( mVertexShaderBytecode, mVertexShaderBytecodeSize, nullptr, &mVertexShader ) );
 
 	long PixelShaderSize = 0;
 	char* PixelShaderBytecode = nullptr;
-	ReadFileResult = MoRE::ReadFileContent( "..\\..\\Example3\\ShaderBinaries\\PixelShader.cso", "rb", &PixelShaderBytecode, PixelShaderSize );
+	ReadFileResult = ReadFileContent( "..\\..\\Example3\\ShaderBinaries\\PixelShader.cso", "rb", &PixelShaderBytecode, PixelShaderSize );
 	assert(ReadFileResult);
 
 	HR( mD3DDevice->CreatePixelShader( PixelShaderBytecode, PixelShaderSize, nullptr, &mPixelShader ) );

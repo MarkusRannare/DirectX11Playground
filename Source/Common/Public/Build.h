@@ -12,3 +12,5 @@
 #define DLL_IMPORT
 #define DLL_EXPORT
 #endif
+
+#define FORCE_INLINE __forceinline;
