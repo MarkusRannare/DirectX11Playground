@@ -20,7 +20,7 @@ Example3App::Example3App( HINSTANCE hInstance ) :
 	mInputLayout( nullptr ),
 	mVertexShaderBytecode( nullptr )
 {
-	mWindowCaption = std::wstring( TEXT( "Example 3 - MoRE" ) );
+	mWindowCaption = std::wstring( TEXT( "Example 3 - MoGET" ) );
 
 	mLastMousePos.x = 0;
 	mLastMousePos.y = 0;
@@ -161,9 +161,13 @@ void Example3App::DrawScene()
 
 	// Update lighting constant buffer
 	ShaderLighting Lighting;
-	Lighting.AmbientLightColor = XMFLOAT3( 0.05f, 0.05f, 0.05f );
-	Lighting.NumDirectionalLights = 2;
+
+	//Lighting.AmbientLightColor = XMFLOAT3( 0.05f, 0.05f, 0.05f );
+	Lighting.AmbientLightColor = XMFLOAT3(0, 0, 0);
 	Lighting.EyeLocaiton = mCameraLocation;
+
+	// Directional lights
+	Lighting.NumDirectionalLights = 2;
 	XMVECTOR Direction = XMVector3Normalize( XMVectorSet( 0.5f, 0.5f, 0.5f, 0.0f ) );
 	XMStoreFloat3(&Lighting.DirectionalLights[0].Direction, Direction );
 
@@ -175,6 +179,18 @@ void Example3App::DrawScene()
 
 	Lighting.DirectionalLights[1].DiffuseColor = XMFLOAT3(0.8f, 0.8f, 1.0f);
 	Lighting.DirectionalLights[1].SpecularColor = XMFLOAT3(1.0f, 0.0f, 0.0f);
+
+	// Point lights
+	ZeroMemory(&Lighting.PointLights, sizeof(PointLight) * MAX_POINT_LIGHTS);
+//	Lighting.PointLights[0].Intensity = 3.0f;
+	Lighting.PointLights[0].DiffuseColor = XMFLOAT3( 0, 0, 1.0f );
+	Lighting.PointLights[0].SpecularColor = XMFLOAT3(1.0f, 1.0f, 0.0f);
+	Lighting.PointLights[0].ExponentialFalloff = 0.005f;
+	Lighting.PointLights[0].LinearFalloff = 0.01f;
+	Lighting.PointLights[0].Location = XMFLOAT3( 0, 30.0f, 0 );
+	Lighting.PointLights[0].OuterRadius = 50.0f;
+	Lighting.NumPointLights = 1;
+
 
 	D3D11_MAPPED_SUBRESOURCE LightingContent;
 	mD3DImmediateContext->Map(mLightingBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &LightingContent);

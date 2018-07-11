@@ -5,7 +5,7 @@
 Example1App::Example1App( HINSTANCE hInstance ) :
 	MoREApp( hInstance )
 {
-	mWindowCaption = std::wstring(TEXT("Example 1 - MoRE"));
+	mWindowCaption = std::wstring(TEXT("Example 1 - MoGET"));
 }
 
 void Example1App::DrawScene()

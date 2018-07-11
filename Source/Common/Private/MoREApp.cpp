@@ -8,7 +8,7 @@
 using namespace DirectX;
 
 static MoREApp* fmoREApp = nullptr;
-static std::wstring fWndClassName( TEXT("MoREWndClassName") );
+static std::wstring fWndClassName( TEXT("MoGETWndClassName") );
 
 // Windows window proc
 static LRESULT CALLBACK MainWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam )
@@ -140,7 +140,7 @@ LRESULT CALLBACK MoREApp::MsgProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 MoREApp::MoREApp( HINSTANCE hInstance ) :
 	mHInstance( hInstance ),
 	mDesiredAdapter( nullptr ),
-	mWindowCaption( TEXT("MoRE =)") ),
+	mWindowCaption( TEXT("MoGET =)") ),
 	mClientWidth( 800 ),
 	mClientHeight( 600 ),
 	mNumVideoAdapters( 0 ),
@@ -456,7 +456,7 @@ bool MoREApp::Init()
 {
 	if( !XMVerifyCPUSupport() )
 	{
-		MessageBox( 0, TEXT( "MoRE requires SSE2 support to properly function" ), 0, 0 );
+		MessageBox( 0, TEXT( "MoGET requires SSE2 support to properly function" ), 0, 0 );
 		return false;
 	}
 

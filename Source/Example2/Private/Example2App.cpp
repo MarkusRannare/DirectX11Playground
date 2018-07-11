@@ -18,7 +18,7 @@ Example2App::Example2App( HINSTANCE hInstance ) :
 	mInputLayout( nullptr ),
 	mVertexShaderBytecode( nullptr )
 {
-	mWindowCaption = std::wstring( TEXT( "Example 2 - MoRE" ) );
+	mWindowCaption = std::wstring( TEXT( "Example 2 - MoGET" ) );
 
 	mLastMousePos.x = 0;
 	mLastMousePos.y = 0;
