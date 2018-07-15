@@ -1,8 +1,8 @@
 #pragma once
 
-#include "MoREApp.h"
+#include "MoGETApp.h"
 
-class Example1App : public MoREApp
+class Example1App : public MoGETApp
 {
 public:
 	Example1App( HINSTANCE hInstance );

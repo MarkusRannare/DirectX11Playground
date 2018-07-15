@@ -10,11 +10,11 @@
  * Base class for windows, please note that this shouldn't be used in real production
  * cases as it's not complete
  */
-class MoREApp
+class MoGETApp
 {
 public:
-	COMMON_API MoREApp( HINSTANCE hInstance );
-	COMMON_API virtual ~MoREApp();
+	COMMON_API MoGETApp( HINSTANCE hInstance );
+	COMMON_API virtual ~MoGETApp();
 
 	COMMON_API virtual bool Init();
 
@@ -23,7 +23,7 @@ public:
 
 	COMMON_API int Run();
 protected:
-	MoREApp() = delete; // Don't allow creating apps this way
+	MoGETApp() = delete; // Don't allow creating apps this way
 		
 	bool InitWindow();
 	bool InitDirect3D();

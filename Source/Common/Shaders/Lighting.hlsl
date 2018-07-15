@@ -106,12 +106,17 @@ float3 CalculatePointLighting( float3 wsVertexPos, float3 wsNormal, float3 wsToE
 	return FinalLighting;
 }
 
+/*float3 CalculateSpotLighting( float3 wsVertexPos, float3 wsNormal, float3 wsToEye )
+{
+}*/
+
 float3 CalculateLighting( float3 wsPos, float3 wsNormal )
 {
 	const float3 wsToEye = normalize(wsEyeLocation - wsPos);
 
 	const float3 DirectionalLighting = CalculateDirectionalLighting(wsNormal, wsToEye);
 	const float3 PointLighting = CalculatePointLighting( wsPos, wsNormal, wsToEye );
+	// const float3 SpotLighting = CalculateSpotLighting( wsPos, wsNormal, wsToEye );
 	// @todo: Calculate lighting from spot lights
 
 	const float3 FinalLighting = DirectionalLighting + PointLighting + AmbientLightColor;

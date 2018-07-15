@@ -3,14 +3,14 @@
 #include <string>
 
 Example1App::Example1App( HINSTANCE hInstance ) :
-	MoREApp( hInstance )
+	MoGETApp( hInstance )
 {
 	mWindowCaption = std::wstring(TEXT("Example 1 - MoGET"));
 }
 
 void Example1App::DrawScene()
 {
-	MoREApp::DrawScene();
+	MoGETApp::DrawScene();
 
 	assert( mD3DImmediateContext );
 	assert( mSwapChain );

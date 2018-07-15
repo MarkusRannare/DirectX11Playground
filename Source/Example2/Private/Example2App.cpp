@@ -8,7 +8,7 @@ using namespace MoGET;
 using namespace DirectX;
 
 Example2App::Example2App( HINSTANCE hInstance ) :
-	MoREApp( hInstance ),
+	MoGETApp( hInstance ),
 	mPhi( 0.25f * (float)Math::Pi ),
 	mTheta( 1.5f * (float)Math::Pi ),
 	mRadius( 7.0f ),
@@ -43,7 +43,7 @@ Example2App::~Example2App()
 
 bool Example2App::Init()
 {
-	if( !MoREApp::Init() )
+	if( !MoGETApp::Init() )
 	{
 		return false;
 	}
@@ -104,7 +104,7 @@ void Example2App::CreateConstantBuffer()
 
 void Example2App::OnResize()
 {
-	MoREApp::OnResize();
+	MoGETApp::OnResize();
 
 	// @todo: Make NearZ and FarZ config variables
 	XMMATRIX Proj = XMMatrixPerspectiveFovLH( 
@@ -117,7 +117,7 @@ void Example2App::OnResize()
 
 void Example2App::DrawScene()
 {
-	MoREApp::DrawScene();
+	MoGETApp::DrawScene();
 
 	assert( mD3DImmediateContext );
 	assert( mSwapChain );
@@ -163,7 +163,7 @@ void Example2App::DrawScene()
 
 void Example2App::UpdateScene( double DeltaTime )
 {
-	MoREApp::UpdateScene( DeltaTime );
+	MoGETApp::UpdateScene( DeltaTime );
 
 	// Convert Spherical to Cartesian coordinates
 	float x = mRadius * sinf(mPhi) * cosf(mTheta);

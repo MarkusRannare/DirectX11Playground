@@ -1,4 +1,4 @@
-#include "MoREApp.h"
+#include "MoGETApp.h"
 #include "Platform.h"
 #include "DX11Utils.h"
 #include <cassert>
@@ -7,7 +7,7 @@
 
 using namespace DirectX;
 
-static MoREApp* fmoGETApp = nullptr;
+static MoGETApp* fmoGETApp = nullptr;
 static std::wstring fWndClassName( TEXT("MoGETWndClassName") );
 
 // Windows window proc
@@ -20,7 +20,7 @@ static LRESULT CALLBACK MainWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM 
 	return fmoGETApp->MsgProc( hwnd, msg, wParam, lParam );
 }
 
-LRESULT CALLBACK MoREApp::MsgProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam )
+LRESULT CALLBACK MoGETApp::MsgProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
 	switch( msg )
 	{
@@ -137,7 +137,7 @@ LRESULT CALLBACK MoREApp::MsgProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 	return DefWindowProc( hwnd, msg, wParam, lParam );
 }
 
-MoREApp::MoREApp( HINSTANCE hInstance ) :
+MoGETApp::MoGETApp( HINSTANCE hInstance ) :
 	mHInstance( hInstance ),
 	mDesiredAdapter( nullptr ),
 	mWindowCaption( TEXT("MoGET =)") ),
@@ -164,7 +164,7 @@ MoREApp::MoREApp( HINSTANCE hInstance ) :
 	fmoGETApp = this;
 }
 
-MoREApp::~MoREApp()
+MoGETApp::~MoGETApp()
 {
 	ReleaseCOM(mD3DImmediateContext);
 	ReleaseCOM(mSwapChain);
@@ -176,7 +176,7 @@ MoREApp::~MoREApp()
 	ReleaseCOM(mD3DDevice);
 }
 
-bool MoREApp::InitWindow()
+bool MoGETApp::InitWindow()
 {
 	WNDCLASS WC;
 	WC.style = CS_HREDRAW | CS_VREDRAW;
@@ -220,7 +220,7 @@ bool MoREApp::InitWindow()
 	return true;
 }
 
-bool MoREApp::InitDirect3D()
+bool MoGETApp::InitDirect3D()
 {
 	UINT CreateDeviceFlags = 0;
 
@@ -337,7 +337,7 @@ bool MoREApp::InitDirect3D()
 	return true;
 }
 
-void MoREApp::EnumerateAdapters()
+void MoGETApp::EnumerateAdapters()
 {	
 	// @todo: Make some kind of intelligent choice of what adapter to use? Like, prefer non intel adapter if possible,
 	// as intel adapters tends to be the slower ones when you have multiple ones installed
@@ -391,7 +391,7 @@ void MoREApp::EnumerateAdapters()
 	ReleaseCOM(Factory);
 }
 
-void MoREApp::OnResize()
+void MoGETApp::OnResize()
 {
 	assert(mD3DImmediateContext);
 	assert(mD3DDevice);
@@ -452,7 +452,7 @@ void MoREApp::OnResize()
 	mD3DImmediateContext->RSSetViewports( 1, &mScreenViewport );
 }
 
-bool MoREApp::Init()
+bool MoGETApp::Init()
 {
 	if( !XMVerifyCPUSupport() )
 	{
@@ -473,7 +473,7 @@ bool MoREApp::Init()
 	return true;
 }
 
-void MoREApp::ProcessMessageQueue()
+void MoGETApp::ProcessMessageQueue()
 {
 	MSG Msg = {0};
 
@@ -490,7 +490,7 @@ void MoREApp::ProcessMessageQueue()
 	}
 }
 
-void MoREApp::CalculateFrameStats()
+void MoGETApp::CalculateFrameStats()
 {
 	// Code computes the average frames per second, and also the 
 	// average time it takes to render one frame.  These stats 
@@ -520,15 +520,15 @@ void MoREApp::CalculateFrameStats()
 	}
 }
 
-void MoREApp::UpdateScene( double DeltaTime )
+void MoGETApp::UpdateScene( double DeltaTime )
 {
 }
 
-void MoREApp::DrawScene()
+void MoGETApp::DrawScene()
 {
 }
 
-int MoREApp::Run()
+int MoGETApp::Run()
 {
 	mTimer.Reset();
 	
@@ -558,12 +558,12 @@ int MoREApp::Run()
 	return -1;
 }
 
-float MoREApp::AspectRatio() const
+float MoGETApp::AspectRatio() const
 {
 	return mClientWidth / (float)mClientHeight;
 }
 
-void MoREApp::ReportLiveObjects()
+void MoGETApp::ReportLiveObjects()
 {
 #ifdef _DEBUG
 	ID3D11Debug* DebugDevice = nullptr;

@@ -14,6 +14,7 @@ namespace MoGET
 {
 	/**
 	 * Standard Array class supporting storage of elements sequentially
+	 * @todo: Allow for custom allocators
 	 */
 	template<class T>
 	class Array
@@ -148,7 +149,7 @@ namespace MoGET
 				private:
 					friend class Array<T>;
 					/**
-					 * Private constructor ised internally to create this iterator
+					 * Private constructor used internally to create this iterator
 					 *
 					 * \param Outer the array we are iterating over
 					 * \param Index the value we are starting it, might not be a valid index

@@ -8,6 +8,8 @@ function( BeginModule ModuleName ModuleType )
 	# @todo: Verify that no other project exists already
 	set( MOGET_CURRENT_MODULE ${ModuleName} CACHE STRING "Name of current module" FORCE )
 	set( MOGET_CURRENT_CONTENT_PATH "${CMAKE_SOURCE_DIR}/../${ModuleName}" CACHE STRING "Path where we put content to current project" FORCE )
+	set( MOGET_BINARIES_PATH "${CMAKE_SOURCE_DIR}../../Binaries/${MOGET_PLATFORM}/" CACHE STRING "The directory where we place our binaries" FORCE  )
+
 	string( TOUPPER ${ModuleName} UpperModule )
 	add_definitions(-D${UpperModule}_EXPORTS )
 	AddDefaultIncludes()
@@ -96,11 +98,7 @@ function( SetupIDEFilters FileList )
     endforeach()
 endfunction( SetupIDEFilters )
 
-function( SetOutputPaths )
-	# This doesn't work... IntermediatePath isn't config in cmake
-	# set( IntermediatePath "../../Intermediate/$(LibraryName)/Win32/$(Config)/" )
-	set( BinariesPath "${CMAKE_SOURCE_DIR}../../Binaries/${MOGET_PLATFORM}/" )
-		
+function( SetOutputPaths )		
 	# These three should work, but I don't know what they do...
 	#ARCHIVE_OUTPUT_DIRECTORY_${UpperConfig} ${LibrariesPath}
 	#LIBRARY_OUTPUT_DIRECTORY_${UpperConfig} ${LibrariesPath}
@@ -110,8 +108,8 @@ function( SetOutputPaths )
 		string (TOUPPER ${Config} UpperConfig)
 
 		set_target_properties(${MOGET_CURRENT_MODULE} PROPERTIES
-			RUNTIME_OUTPUT_DIRECTORY_${UpperConfig} ${BinariesPath}
-			PDB_OUTPUT_DIRECTORY_${UpperConfig} ${BinariesPath}
+			RUNTIME_OUTPUT_DIRECTORY_${UpperConfig} ${MOGET_BINARIES_PATH}
+			PDB_OUTPUT_DIRECTORY_${UpperConfig} ${MOGET_BINARIES_PATH}
 			OUTPUT_NAME_${UpperConfig} ${MOGET_CURRENT_MODULE}-${Config}
 		)
     endforeach ()
@@ -120,10 +118,8 @@ endfunction( SetOutputPaths )
 function( DependsOn ModuleName )
 	# Make sure other project is compiled first
 	add_dependencies( ${MOGET_CURRENT_MODULE} ${ModuleName} )
-	# Link against other library
-	set( Directory "${MOGET_INTERMEDIATE_BUILD_DIR}/${MOGET_PLATFORM}/${ModuleName}/" )
-	target_link_libraries( ${MOGET_CURRENT_MODULE} debug "${Directory}Debug/${ModuleName}-Debug.lib" )
-	target_link_libraries( ${MOGET_CURRENT_MODULE} optimized "${Directory}Release/${ModuleName}-Release.lib" )
+	# Link against other library, magically finds configuration type o.O
+	target_link_libraries(${MOGET_CURRENT_MODULE} ${ModuleName} )
 	# Let us include files from other projects Public directory
 	include_directories("${CMAKE_SOURCE_DIR}/${ModuleName}/Public")
 endfunction( DependsOn )

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MoREApp.h"
+#include "MoGETApp.h"
 #include <DirectXMath.h>
 #include <DirectXPackedVector.h>
 
@@ -16,7 +16,7 @@ struct VS_ConstantBuffer
 	DirectX::XMFLOAT4X4 WorldViewProj;
 };
 
-class Example3App : public MoREApp
+class Example3App : public MoGETApp
 {
 public:
 	Example3App( HINSTANCE hInstance );
